@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.curseforge.com/minecraft/mc-mods/*
 // @grant       none
-// @version     1.3.1
+// @version     1.3.2
 // @author      devBoi76
 // @license     MIT
 // @description Redirect curseforge.com mod pages to modrinth.com when possible

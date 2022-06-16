@@ -86,7 +86,7 @@ let mod_name_noloader = undefined
 let page = undefined
 
 if (tab_title.indexOf("- Mods") != -1) {
-	mod_name = tab_title.split("- Mods")[0].trim()
+	mod_name = document.querySelector("head meta[property='og:title']").getAttribute("content")
 	mod_name_noloader = mod_name.replace(REGEX, "")
 	page = "mods"
 } else if (tab_title.indexOf("- Search") != -1) {
