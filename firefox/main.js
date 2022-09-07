@@ -59,11 +59,11 @@ const DONATE_HTML = `\
 border-top-left-radius: 0;\
 border-bottom-left-radius: 0;\
 font-weight: 600;"\
-data-tooltip="Support the author"> \
+data-tooltip="Support the Author"> \
 <figure class="icon icon-margin relative w-5 h-4" >\
 <img src=${browser.runtime.getURL("icons/kofilogo.png")}>\
 </figure>\
-Support the author
+Support the Author
 </a> \
 `
 
@@ -79,86 +79,120 @@ const SEARCH_PAGE_HTML = `<a href="REDIRECT" target="_blank" class="box flex" st
 <div class="mx-2 font-bold" style="display: inline-block">MOD_NAME</div>\
 <div style="display: inline-block">BUTTON_HTML</div></div></a>`
 
-const query = "head title"
+let query = "head title"
 const tab_title = document.querySelector(query).innerText
 let mod_name = undefined
 let mod_name_noloader = undefined
 let page = undefined
 
-if (tab_title.indexOf("- Mods") != -1) {
-	mod_name = document.querySelector("head meta[property='og:title']").getAttribute("content")
-	mod_name_noloader = mod_name.replace(REGEX, "")
-	page = "mods"
-} else if (tab_title.indexOf("- Search") != -1) {
-	mod_name = tab_title.split("- Search")[0].trim()
-	mod_name_noloader = mod_name.replace(REGEX, "")
-	page = "search"
-}
+function main() {
 
-fetch(`https://api.modrinth.com/v2/search?limit=3&query=${mod_name_noloader}`, {method: "GET", mode: "cors"})
-.then(response => response.json())
-.then(resp => {
-	
-	if (page == undefined) {
-		return
-	}
-	
-	if (resp.hits.length == 0) {
-		return
-	}
-	
-	let max_sim = 0
-	let max_hit = undefined
+	const url = document.URL.split("/")
 
-	for (const hit of resp.hits) {
-		if (similarity(hit.title.trim(), mod_name) > max_sim) {
-			max_sim = similarity(hit.title.trim(), mod_name)
-			max_hit = hit
+	page = url[4]
+
+	const is_search = (url[5].split("?")[0] == "search" && url[5].split("?").length >= 2)
+
+	if (is_search) {
+		search_query = document.querySelector(".mt-6 > h2:nth-child(1)").textContent.match(/Search results for '(.*)'/)[1];
+	} else {
+		search_query = document.querySelector("head meta[property='og:title']").getAttribute("content")
+	}
+
+	if (is_search) {
+		mod_name = search_query
+		mod_name_noloader = mod_name.replace(REGEX, "")
+	} else {
+		mod_name = search_query
+		mod_name_noloader = mod_name.replace(REGEX, "")
+	}
+
+	api_facets = ""
+	switch (page) {
+		//=Mods===============
+		case "mc-mods":
+			api_facets =`facets=[["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'"],["project_type:mod"]]`
+			break
+		//=Server=Plugins=====
+		case "bukkit-plugins":
+			api_facets = `facets=[["categories:'bukkit'","categories:'spigot'","categories:'paper'","categories:'purpur'","categories:'sponge'","categories:'bungeecord'","categories:'waterfall'","categories:'velocity'"],["project_type:mod"]]`
+			break
+		//=Resource=Packs=====
+		case "texture-packs":
+			api_facets = `facets=[["project_type:resourcepack"]]`
+			break
+		//=Modpacks===========
+		case "modpacks":
+			api_facets = `facets=[["project_type:modpack"]]`
+			break
+	}
+
+	fetch(`https://api.modrinth.com/v2/search?limit=3&query=${mod_name_noloader}&${api_facets}`, {method: "GET", mode: "cors"})
+	.then(response => response.json())
+	.then(resp => {
+		
+		if (page == undefined) {
+			return
 		}
-		if (similarity(hit.title.trim(), mod_name_noloader) > max_sim) {
-			max_sim = similarity(hit.title.trim(), mod_name_noloader)
-			max_hit = hit
+		
+		if (resp.hits.length == 0) {
+			return
 		}
-	}
-	if (max_sim <= 0.8) {
-		return
-	}
-	let query = ""
-	if (page == "mods") {
-		query = "div.-mx-1:nth-child(1)"
-		let s = document.querySelector(query)
 		
-		s.innerHTML += MOD_PAGE_HTML
-		.replace("ICON_SOURCE", max_hit.icon_url)
-		.replace("MOD_NAME", max_hit.title.trim())
-		.replace("REDIRECT", `https://modrinth.com/mod/${max_hit.slug}`)
-		.replace("BUTTON_HTML", HTML)
-		
-	} else if (page == "search") {
-		query = ".mt-6 > div:nth-child(3)"
-		let s = document.querySelector(query)
-		s.innerHTML += SEARCH_PAGE_HTML
-		.replace("ICON_SOURCE", max_hit.icon_url)
-		.replace("MOD_NAME", max_hit.title.trim())
-		.replace("REDIRECT", `https://modrinth.com/mod/${max_hit.slug}`)
-		.replace("BUTTON_HTML", HTML)
-		
-	}
-	
-	fetch(`https://api.modrinth.com/v2/project/${max_hit.slug}`, {method: "GET", mode: "cors"})
-	.then(response_p => response_p.json())
-	.then(resp_p => {
-		if (resp_p.donation_urls.length > 0) {
-			let donations = resp_p.donation_urls
-			let dbutton = document.createElement("div")
-			dbutton.innerHTML = DONATE_HTML.replace("REDIRECT", donations[0].url)
-			dbutton.style.display = "inline-block"
-			console.log(dbutton)
-			let redir = document.getElementById("modrinthify-redirect")
-			redir.after(dbutton)
-			if (page == "mods") {
-				redir.parentNode.parentNode.parentNode.style.marginRight = "-150px"
+		let max_sim = 0
+		let max_hit = undefined
+
+		for (const hit of resp.hits) {
+			if (similarity(hit.title.trim(), mod_name) > max_sim) {
+				max_sim = similarity(hit.title.trim(), mod_name)
+				max_hit = hit
+			}
+			if (similarity(hit.title.trim(), mod_name_noloader) > max_sim) {
+				max_sim = similarity(hit.title.trim(), mod_name_noloader)
+				max_hit = hit
 			}
 		}
+		if (max_sim <= 0.7) {
+			return
+		}
+		// Add the buttons
+		if (is_search) {
+			query = ".mt-6 > div:nth-child(3)"
+			let s = document.querySelector(query)
+			s.innerHTML += SEARCH_PAGE_HTML
+			.replace("ICON_SOURCE", max_hit.icon_url)
+			.replace("MOD_NAME", max_hit.title.trim())
+			.replace("REDIRECT", `https://modrinth.com/project/${max_hit.slug}`)
+			.replace("BUTTON_HTML", HTML)
+			
+		} else {
+			query = "div.-mx-1:nth-child(1)"
+			let s = document.querySelector(query)
+			
+			s.innerHTML += MOD_PAGE_HTML
+			.replace("ICON_SOURCE", max_hit.icon_url)
+			.replace("MOD_NAME", max_hit.title.trim())
+			.replace("REDIRECT", `https://modrinth.com/project/${max_hit.slug}`)
+			.replace("BUTTON_HTML", HTML)
+		}
+		// Add donation button if present
+		fetch(`https://api.modrinth.com/v2/project/${max_hit.slug}`, {method: "GET", mode: "cors"})
+		.then(response_p => response_p.json())
+		.then(resp_p => {
+			if (resp_p.donation_urls.length > 0) {
+				let donations = resp_p.donation_urls
+				let dbutton = document.createElement("div")
+				dbutton.innerHTML = DONATE_HTML.replace("REDIRECT", donations[0].url)
+				dbutton.style.display = "inline-block"
+				console.log(dbutton)
+				let redir = document.getElementById("modrinthify-redirect")
+				redir.after(dbutton)
+				if (!is_search) {
+					redir.parentNode.parentNode.parentNode.style.marginRight = "-150px"
+				}
+			}
+		})
 	})
-})
+}
+
+main()
