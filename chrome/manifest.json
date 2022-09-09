@@ -16,12 +16,16 @@
     {
       "matches": ["*://*.curseforge.com/minecraft/*"],
       "js": ["main.js"]
+    },
+    {
+      "matches": ["*://*.spigotmc.org/*"],
+      "js": ["spigot.js"]
     }
   ],
   "web_accessible_resources": [
     {
       "resources": ["icons/kofilogo.png"],
-      "matches": ["https://*.curseforge.com/*"]
+      "matches": ["https://*.curseforge.com/*", "https://*.spigotmc.org/*"]
     }
   ]
 
