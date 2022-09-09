@@ -11,6 +11,10 @@ The extension is available for [firefox](https://addons.mozilla.org/pl/firefox/a
 ![image](https://user-images.githubusercontent.com/77896685/173103357-f2915565-a198-438e-8c68-582fe583f11a.png)
 ![image](https://user-images.githubusercontent.com/77896685/188920913-2f04db54-2fcd-408a-803b-9ebc9cdeb033.png)
 
+Redirects on spigotmc.org:
+
+![image](https://user-images.githubusercontent.com/77896685/189420503-ba50a9d4-69f4-4772-8f50-7530b84f014d.png)
+
 ---
 
 
