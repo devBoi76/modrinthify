@@ -82,10 +82,6 @@ PLUGIN_PAGE_HTML = `<style>#modrinth-body {
 Get on Modrinth
 </div>
 </div></div></a>`
-// const MOD_PAGE_HTML = `<a id="modrinth-body" href="REDIRECT" target="_blank" class="box flex" style="overflow: hidden; height: max-content; margin-top: -1px;"><div>\
-// <img style="display:inline-block; height: 3rem" src="ICON_SOURCE">\
-// <div class="mx-2 font-bold" style="display: inline-block">MOD_NAME</div>\
-// <div style="display: inline-block">BUTTON_HTML</div></div></a>`
 
 const SEARCH_PAGE_HTML = `<a href="REDIRECT" target="_blank" class="box flex" style="overflow: hidden"><div>\
 <img style="display:inline-block; height: 3rem" src="ICON_SOURCE">\
@@ -129,10 +125,6 @@ function main() {
                 max_sim = similarity(hit.title.trim(), query)
                 max_hit = hit
             }
-            // if (similarity(hit.title.trim(), mod_name_noloader) > max_sim) {
-            //     max_sim = similarity(hit.title.trim(), mod_name_noloader)
-            //     max_hit = hit
-            // }
         }
         if (max_sim <= 0.7) {
             return
