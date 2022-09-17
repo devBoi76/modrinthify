@@ -15,6 +15,12 @@ Redirects on spigotmc.org:
 
 ![image](https://user-images.githubusercontent.com/77896685/189420503-ba50a9d4-69f4-4772-8f50-7530b84f014d.png)
 
+As of version 1.5 the extension also has Modrinth notifications integration!
+*note: this works only on firefox and chrome, not with userscripts*
+
+![ext_popup_firefox](https://user-images.githubusercontent.com/77896685/190860461-d2ed396e-3b11-4e61-bc1f-1c3f6bb9b2d2.png)
+![ext_popup_chrome](https://user-images.githubusercontent.com/77896685/190860463-91f1db9d-e8cf-4fd0-a46d-641ceb78d721.png)
+
 ---
 
 
