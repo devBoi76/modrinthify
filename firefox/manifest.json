@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Modrinthify",
-  "version": "1.4",
+  "version": "1.4.1",
 
   "description": "When looking at Minecraft mods on CurseForge this extension automatically searches Modrinth for the mod and shows you a redirect button if it finds it",
 
@@ -10,8 +10,19 @@
     "48": "icons/favicon.png" 
   },
   "permissions": [
-    "https://api.modrinth.com/v2/*"
+    "https://api.modrinth.com/v2/*",
+    "storage",
+    "alarms",
   ],
+  
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "modrinthify@jboi76.net",
+      "strict_min_version": "42.0"
+    }
+  },
+  
+  
   "content_scripts": [
     {
       "matches": ["*://*.curseforge.com/minecraft/*"],
@@ -24,6 +35,14 @@
   ],
   "web_accessible_resources": [
     "icons/kofilogo.png"
-  ]
+  ],
+  "browser_action": {
+    "default_icon": "icons/favicon.png",
+    "default_title": "Modrinthify",
+    "default_popup": "html/main.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
 }
 
