@@ -166,11 +166,23 @@ async function updateNotifs(ignore_last_checked) {
             n_updated += 1
         }
     }
-
+    
+    if (document.querySelector("#no-notifs")) {
+        document.querySelector("#no-notifs").remove()
+    }
+    
     if (n_updated > 0) {
         browser.browserAction.setBadgeText({text: n_updated.toString()});
     } else {
+        let no_notifs = document.createElement("div")
+        no_notifs.classList = "notification"
+        no_notifs.id = "no-notifs"
+        no_notifs.innerHTML = `<div class="header"><h4>No new notifications</h4></div>`
+        document.querySelector("#notifications").appendChild(no_notifs)
         browser.browserAction.setBadgeText({text: ""});
+        
+        document.querySelector("#refresh-icon-a").classList = ""
+        return;
     }
     // Do this here to minimize blank time
     document.querySelectorAll("#notifications *").forEach((el) => 

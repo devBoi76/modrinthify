@@ -73,7 +73,6 @@ async function browserAlarmListener(e) {
         }
         
     }
-    console.log("bg")
 }
 
 async function setAlarm() {
