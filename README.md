@@ -4,7 +4,7 @@ When looking at Minecraft mods, modpacks, plugins and resource packs on cursefor
 
 The extension will also show the creator's donation page whenever present
 
-The extension is available for [firefox](https://addons.mozilla.org/pl/firefox/addon/modrinthify/), [chrome](https://chrome.google.com/webstore/detail/modrinthify/gjjlcbppchpjacimpkjhoancdbdmpcoc?hl=pl) and [as a userscript](https://greasyfork.org/en/scripts/445993-modrinthify), [spigot userscript](https://greasyfork.org/en/scripts/451067-modrinthify-spigot)
+The extension is available for [firefox](https://addons.mozilla.org/en-US/firefox/addon/modrinthify/), [chrome](https://chrome.google.com/webstore/detail/modrinthify/gjjlcbppchpjacimpkjhoancdbdmpcoc) and [as a userscript](https://greasyfork.org/en/scripts/445993-modrinthify), [spigot userscript](https://greasyfork.org/en/scripts/451067-modrinthify-spigot)
 
 ![image](https://user-images.githubusercontent.com/77896685/173103271-b4d7d5a5-ce3e-4bd2-96e7-ec8e124a9f81.png)
 ![image](https://user-images.githubusercontent.com/77896685/173103340-aefd345d-fdee-4fa3-9dfa-92f458a35a34.png)
