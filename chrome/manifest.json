@@ -2,7 +2,7 @@
 
   "manifest_version": 3,
   "name": "Modrinthify",
-  "version": "1.4",
+  "version": "1.4.1",
 
   "description": "Redirect curseforge.com mod pages to modrinth.com when possible",
 
@@ -11,6 +11,10 @@
   },
   "host_permissions": [
     "https://api.modrinth.com/v2/*"
+  ],
+  "permissions": [
+    "storage",
+    "alarms"
   ],
   "content_scripts": [
     {
@@ -27,7 +31,15 @@
       "resources": ["icons/kofilogo.png"],
       "matches": ["https://*.curseforge.com/*", "https://*.spigotmc.org/*"]
     }
-  ]
+  ],
+  "action": {
+    "default_icon": "icons/favicon.png",
+    "default_title": "Modrinthify",
+    "default_popup": "html/main.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
 
 }
 
