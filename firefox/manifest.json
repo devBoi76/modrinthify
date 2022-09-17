@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Modrinthify",
-  "version": "1.4.1",
+  "version": "1.5",
 
   "description": "When looking at Minecraft mods on CurseForge this extension automatically searches Modrinth for the mod and shows you a redirect button if it finds it",
 
