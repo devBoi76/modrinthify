@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Modrinthify
+// @name        Modrinthify Spigot
 // @namespace   Violentmonkey Scripts
 // @match       *://*.spigotmc.org/*
 // @grant       none
-// @version     1.4
+// @version     1.4.1.1
 // @author      devBoi76
 // @license     MIT
 // @description Redirect spigotmc.org mod pages to modrinth.com when possible
