@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.spigotmc.org/*
 // @grant       none
-// @version     1.4.1.1
+// @version     1.4.1.2
 // @author      devBoi76
 // @license     MIT
 // @description Redirect spigotmc.org mod pages to modrinth.com when possible
