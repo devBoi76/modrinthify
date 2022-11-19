@@ -175,7 +175,8 @@ async function updateNotifs(ignore_last_checked) {
 
     if (n_updated > 0) {
         chrome.action.setBadgeText({text: n_updated.toString()});
-    } else {
+    } 
+    if (n_updated == 0 && n_old == 0) {
         let no_notifs = document.createElement("div")
         no_notifs.classList = "notification"
         no_notifs.id = "no-notifs"
