@@ -149,7 +149,7 @@ function main() {
             div.outerHTML = s.innerHTML = PLUGIN_PAGE_HTML
 			.replace("MR_ICON", max_hit.icon_url)
 			.replace("MR_NAME", max_hit.title.trim())
-			.replace("MR_HREF", `https://modrinth.com/project/${max_hit.slug}`)
+			.replace("MR_HREF", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 			.replace("BUTTON_HTML", HTML) + s.innerHTML
 
 			s.after(div)
@@ -160,7 +160,7 @@ function main() {
 			s.innerHTML = PLUGIN_PAGE_HTML
 			.replace("MR_ICON", max_hit.icon_url)
 			.replace("MR_NAME", max_hit.title.trim())
-			.replace("MR_HREF", `https://modrinth.com/project/${max_hit.slug}`)
+			.replace("MR_HREF", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 			.replace("BUTTON_HTML", HTML) + s.innerHTML
 		}
 

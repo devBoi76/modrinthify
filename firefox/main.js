@@ -162,7 +162,7 @@ function main() {
 			s.innerHTML += SEARCH_PAGE_HTML
 			.replace("ICON_SOURCE", max_hit.icon_url)
 			.replace("MOD_NAME", max_hit.title.trim())
-			.replace("REDIRECT", `https://modrinth.com/project/${max_hit.slug}`)
+			.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 			.replace("BUTTON_HTML", HTML)
 			
 		} else {
@@ -172,7 +172,7 @@ function main() {
 			s.innerHTML += MOD_PAGE_HTML
 			.replace("ICON_SOURCE", max_hit.icon_url)
 			.replace("MOD_NAME", max_hit.title.trim())
-			.replace("REDIRECT", `https://modrinth.com/project/${max_hit.slug}`)
+			.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 			.replace("BUTTON_HTML", HTML)
 		}
 		// Add donation button if present
