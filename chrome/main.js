@@ -1,3 +1,9 @@
+function htmlToElements(html) {
+    var t = document.createElement('template');
+    t.innerHTML = html;
+    return t.content;
+}
+
 function similarity(s1, s2) {
 	var longer = s1;
 	var shorter = s2;
@@ -159,21 +165,21 @@ function main() {
 		if (is_search) {
 			query = ".mt-6 > div:nth-child(3)"
 			let s = document.querySelector(query)
-			s.innerHTML += SEARCH_PAGE_HTML
-			.replace("ICON_SOURCE", max_hit.icon_url)
-			.replace("MOD_NAME", max_hit.title.trim())
-			.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
-			.replace("BUTTON_HTML", HTML)
-			
+			let buttonElement = htmlToElements(SEARCH_PAGE_HTML
+				.replace("ICON_SOURCE", max_hit.icon_url)
+				.replace("MOD_NAME", max_hit.title.trim())
+				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
+				.replace("BUTTON_HTML", HTML))
+			s.appendChild(buttonElement)			
 		} else {
 			query = "div.-mx-1:nth-child(1)"
 			let s = document.querySelector(query)
-			
-			s.innerHTML += MOD_PAGE_HTML
-			.replace("ICON_SOURCE", max_hit.icon_url)
-			.replace("MOD_NAME", max_hit.title.trim())
-			.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
-			.replace("BUTTON_HTML", HTML)
+			let buttonElement = htmlToElements(MOD_PAGE_HTML
+				.replace("ICON_SOURCE", max_hit.icon_url)
+				.replace("MOD_NAME", max_hit.title.trim())
+				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
+				.replace("BUTTON_HTML", HTML))
+			s.appendChild(buttonElement)
 		}
 		// Add donation button if present
 		fetch(`https://api.modrinth.com/v2/project/${max_hit.slug}`, {method: "GET", mode: "cors"})
