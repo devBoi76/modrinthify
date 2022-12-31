@@ -11,11 +11,15 @@ auto_cr_path = os.getcwd() + "/" + OUT_FOLDER
 
 files = []
 
+copy_files = []
+
 # r=root, d=directories, f = files
 for r, d, f in os.walk(ff_path):
     for file in f:
         if file.endswith(".js"):
             files.append(os.path.join(r, file))
+        else:
+            copy_files.append(os.path.join(r, file))
 
 for f in files:
     print(f)
@@ -29,4 +33,10 @@ for f in files:
         ff_text = ff_file.read()
         auto_cr_file.write(ff_text.replace("browser.", "chrome."))
         auto_cr_file.close()
-    
+
+for f in copy_files:
+    print("COPY", f)
+    autogen_cr_filename = f.replace("firefox", OUT_FOLDER)
+    cr_filename = f.replace("firefox", "chrome")
+    os.makedirs(os.path.dirname(autogen_cr_filename), exist_ok=True)
+    os.system(f"cp {cr_filename} {autogen_cr_filename}")

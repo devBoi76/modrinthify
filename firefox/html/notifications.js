@@ -332,6 +332,9 @@ async function saveOptions(e) {
     console.log(old_token, '"', token)
 
     if (old_token.token != token && notif_enable == true) {
+
+        let close_icon = document.querySelector("#close-icon svg")
+        close_icon.classList = "spinning"
         let h = new Headers({
             "Authorization": token,
             "User-Agent": `devBoi76/modrinthify/${browser.runtime.getManifest().version}`
@@ -340,7 +343,7 @@ async function saveOptions(e) {
         let resp = await fetch(API_BASE+"/user", {
             headers: h
         })
-    
+        close_icon.classList = ""
         if (resp.status == 401) {
             document.querySelector(".error").innerText = "Invalid authorization token"
             document.querySelector(".error").style.display = "block"
