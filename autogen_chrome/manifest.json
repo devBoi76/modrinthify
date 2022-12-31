@@ -1,0 +1,45 @@
+{
+
+  "manifest_version": 3,
+  "name": "Modrinthify",
+  "version": "1.5.3",
+
+  "description": "Redirect Curseforge mod pages to Modrinth and show Modrinth notifications",
+
+  "icons": {
+    "48": "icons/favicon.png" 
+  },
+  "host_permissions": [
+    "https://api.modrinth.com/v2/*"
+  ],
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.curseforge.com/minecraft/*"],
+      "js": ["main.js"]
+    },
+    {
+      "matches": ["*://*.spigotmc.org/*"],
+      "js": ["spigot.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/kofilogo.png"],
+      "matches": ["https://*.curseforge.com/*", "https://*.spigotmc.org/*"]
+    }
+  ],
+  "action": {
+    "default_icon": "icons/favicon.png",
+    "default_title": "Modrinthify",
+    "default_popup": "html/main.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+
+}
+
