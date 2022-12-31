@@ -10,7 +10,7 @@ let global_auth_token = ""
 
 const N_VERSIONS = 3;
 
-const version_regex = /The project, .*, has released a new version: (.*)/m
+const version_regex = /The project,? .*,? has released a new version: (.*)/m
 
 function timeStringForUnix(unix) {
     if (unix > DAY) {
