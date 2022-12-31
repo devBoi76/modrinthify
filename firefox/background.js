@@ -1,10 +1,12 @@
 const API_BASE = "https://api.modrinth.com/v2/user/"
 
 async function fetchNotifs(user, token) {
+    let h = new Headers({
+        "Authorization": token,
+        "User-Agent": `devBoi76/modrinthify/${browser.runtime.getManifest().version}`
+    })
     let resp = await fetch(API_BASE+user+"/notifications", {
-        headers: {
-            Authorization: token 
-        }
+        headers: h
     })
 
     if (resp.status != 200) {
