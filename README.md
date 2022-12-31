@@ -24,7 +24,10 @@ As of version 1.5 the extension also has Modrinth notifications integration!
 ---
 
 
-The source code is split into 3 folders, `firefox`, `chrome` and `greasyfork`, each of them contains the source code used for the platform
+The source code is split into 4 folders, `firefox`, `chrome`, `chrome_autogen` and `greasyfork`, each of them contains the source code used for the platform
+
+The `chrome` folder contains non-javascript files that can't be easily converted from the firefox version
+The `chrome_autogen` folder is the output folder for `convert_chrome.py`, which automatically converts firefox javascript files to be compatible with chrome
 
 Feel free to post any issues or suggestions you might have on the issues page
 
