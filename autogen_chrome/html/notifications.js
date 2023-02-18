@@ -1,14 +1,12 @@
-// import * as common from "/common"
+chrome.browserAction = chrome.action
 
-const API_BASE = "https://api.modrinth.com/v2/user/"
+const API_BASE = "https://api.modrinth.com/v2"
 const LINK_BASE = "https://modrinth.com"
 
 const MINUTE = 60 * 1000
 const HOUR = 3600 * 1000
 const DAY = 86400 * 1000
 
-let global_user = ""
-let global_auth_token = ""
 
 const N_VERSIONS = 3;
 
@@ -28,10 +26,12 @@ function timeStringForUnix(unix) {
 }
 
 async function fetchNotifs(user, token) {
-    let resp = await fetch(API_BASE+user+"/notifications", {
-        headers: {
-            Authorization: token 
-        }
+    let h = new Headers({
+        "Authorization": token,
+        "User-Agent": `devBoi76/modrinthify/${chrome.runtime.getManifest().version}`
+    })
+    let resp = await fetch(API_BASE+"/user/"+user+"/notifications", {
+        headers: h
     })
 
     if (resp.status != 200) {
@@ -87,10 +87,10 @@ function toggleExpandNotif() {
 
 async function updateNotifs(ignore_last_checked) {
     ignore_last_checked == ignore_last_checked || false
-    
+
     let notif_enable = (await chrome.storage.sync.get("notif_enable")).notif_enable
     let last_status = (await chrome.storage.sync.get(["issue_connecting"])).issue_connecting
-    
+
     // "Notifications disabled"
 
     if (document.querySelector("#notif-enable-popup")) {
@@ -109,7 +109,7 @@ async function updateNotifs(ignore_last_checked) {
         notif_enable_popup.id = "notif-enable-popup"
         notif_enable_popup.innerHTML = `<div class="header"><h4>Notifications are disabled</h4><p>Go to settings to enable them</p></div>`
         document.querySelector("#notifications").appendChild(notif_enable_popup)
-        chrome.action.setBadgeText({text: ""});
+        chrome.browserAction.setBadgeText({text: ""});
         return
     }
 
@@ -123,23 +123,23 @@ async function updateNotifs(ignore_last_checked) {
         restoreSettings()
         return;
     }
-    
+
     document.querySelector("#refresh-icon-a").classList = "spinning"
 
-    global_user = (await chrome.storage.sync.get("user")).user
+    let global_user = (await chrome.storage.sync.get("user")).user
     
-    global_auth_token = (await chrome.storage.sync.get("token")).token
+    let global_auth_token = (await chrome.storage.sync.get("token")).token
     let resp = await fetchNotifs(global_user, global_auth_token)
 
     if (resp.status == 401) {
         chrome.storage.sync.set({issue_connecting: 401})
-        chrome.action.setBadgeText({text: "ERR"});
+        chrome.browserAction.setBadgeText({text: "ERR"});
         document.querySelector("#refresh-icon-a").classList = ""
         restoreSettings()
         return
     } else if (resp.status == 404) {
         chrome.storage.sync.set({issue_connecting: 404})
-        chrome.action.setBadgeText({text: "ERR"});
+        chrome.browserAction.setBadgeText({text: "ERR"});
         document.querySelector("#refresh-icon-a").classList = ""
         restoreSettings()
         return
@@ -172,9 +172,9 @@ async function updateNotifs(ignore_last_checked) {
     if (document.querySelector("#no-notifs")) {
         document.querySelector("#no-notifs").remove()
     }
-
+    
     if (n_updated > 0) {
-        chrome.action.setBadgeText({text: n_updated.toString()});
+        chrome.browserAction.setBadgeText({text: n_updated.toString()});
     } 
     if (n_updated == 0 && n_old == 0) {
         let no_notifs = document.createElement("div")
@@ -182,7 +182,7 @@ async function updateNotifs(ignore_last_checked) {
         no_notifs.id = "no-notifs"
         no_notifs.innerHTML = `<div class="header"><h4>No new notifications</h4></div>`
         document.querySelector("#notifications").appendChild(no_notifs)
-        chrome.action.setBadgeText({text: ""});
+        chrome.browserAction.setBadgeText({text: ""});
         
         document.querySelector("#refresh-icon-a").classList = ""
         return;
@@ -292,7 +292,6 @@ async function updateNotifs(ignore_last_checked) {
     document.querySelector("#refresh-icon-a").classList = ""
 }
 
-// return whether the settings page should close after saving
 async function saveOptions(e) {
     if (e) {
         e.preventDefault();
@@ -300,51 +299,80 @@ async function saveOptions(e) {
     let form = document.querySelector("form")
     
     const data = new FormData(form)
-
+    
     let theme = data.get("theme") || "auto"
     
     const notif_enable = data.get("notif-enable") == "on";
     const check_delay = data.get("notif-check-delay");
     
-
     const token = data.get("token").trim();
-    const user = data.get("user").trim();
-    
+    console.log(token)
 
-    if (notif_enable == true && (user == "" || user == undefined || token == "" || token == undefined)) {
+    if (notif_enable == true && (token == "" || token == undefined)) {
         document.querySelector(".error").innerText = "Please fill out these fields to enable notifications"
         document.querySelector(".error").style.display = "block"
-
-        if (user == "" || user == undefined) {
-            document.querySelector("#user").style.outline = "4px solid #db316255"
-        } 
-        if (token == "" || token == undefined) {
-            document.querySelector("#token").style.outline = "4px solid #db316255"
-        }
+        document.querySelector("#token").style.outline = "4px solid #db316255"
         
         chrome.storage.sync.set({
             check_delay: check_delay,
             theme: theme,
             notif_enable: false,
             issue_connecting: 0,
-            token: token,
-            user: user
         })
 
         return false
+    } else if (notif_enable == false) {
+        if (token == undefined) {
+            token = ""
+        }
+        await chrome.storage.sync.set({
+            token: token
+        })
     }
 
-    chrome.storage.sync.set({
+    let old_token = await chrome.storage.sync.get("token")
+    console.log(old_token, '"', token)
+
+    if (old_token.token != token && notif_enable == true) {
+
+        let close_icon = document.querySelector("#close-icon svg")
+        close_icon.classList = "spinning"
+        let h = new Headers({
+            "Authorization": token,
+            "User-Agent": `devBoi76/modrinthify/${chrome.runtime.getManifest().version}`
+        })
+
+        let resp = await fetch(API_BASE+"/user", {
+            headers: h
+        })
+        close_icon.classList = ""
+        if (resp.status == 401) {
+            document.querySelector(".error").innerText = "Invalid authorization token"
+            document.querySelector(".error").style.display = "block"
+            document.querySelector("#token").style.outline = "4px solid #db316255"
+
+            chrome.storage.sync.set({
+                check_delay: check_delay,
+                theme: theme,
+                notif_enable: false,
+                issue_connecting: 0,
+            })
+            return false
+        }
+        
+        let resp_json = await resp.json()
+        chrome.storage.sync.set({
+            token: token,
+            user: resp_json.username
+        })
+    }
+    
+    await chrome.storage.sync.set({
         check_delay: check_delay,
         theme: theme,
         notif_enable: notif_enable,
         issue_connecting: 0,
-        token: token,
-        user: user
     })
-
-    global_user = user
-    global_auth_token = token
     document.querySelector(".error").style.display = "none"
     return true
 }
@@ -357,21 +385,21 @@ async function restoreSettings() {
     
     document.querySelector("#notif-enable").checked = a.notif_enable || false;
     document.querySelector("#token").value = a.token || "";
-    document.querySelector("#user").value = a.user || "";
+
     a.theme = a.theme || "auto"
     document.querySelector(`#${a.theme}-theme`).checked = "on"
     document.querySelector("#notif-check-delay").value = a.check_delay || 5
 
     if (a.issue_connecting != 0) {
         if (a.issue_connecting == 401) {
-            document.querySelector(".error").innerText = "There has been an issue connecting to Modrinth:\nError 401 Unauthorized\n(Wrong token)"
+            document.querySelector(".error").innerText = "There has been an issue connecting to Modrinth:\nError 401 Unauthorized\n(Invalid token)"
             document.querySelector(".error").style.display = "block"
             document.querySelector("#token").style.outline = "4px solid #db316255"
         }
         else if (a.issue_connecting == 404) {
-            document.querySelector(".error").innerText = "There has been an issue connecting to Modrinth:\nError 404 User not found"
+            document.querySelector(".error").innerText = "There has been an issue connecting to Modrinth:\nError 404 User not found\n(Invalid token)"
             document.querySelector(".error").style.display = "block"
-            document.querySelector("#user").style.outline = "4px solid #db316255"
+    
         }
     }
     
@@ -380,7 +408,6 @@ async function restoreSettings() {
 async function closeSettings() {
     document.querySelector(".error").style.display = "none"
     document.querySelector("#token").style.outline = "none"
-    document.querySelector("#user").style.outline    = "none"
     let do_close = await saveOptions()
     if (do_close) {
         document.querySelector("#main").style.display = "block"
@@ -391,7 +418,6 @@ async function closeSettings() {
 }
 
 async function updateLastChecked() {
-    // unix = Date.parse("2022-09-14T17:47:55.165Z")
     unix = Date.now();
     chrome.storage.sync.set({
         last_checked: unix

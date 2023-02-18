@@ -1,10 +1,14 @@
+chrome.browserAction = chrome.action
+
 const API_BASE = "https://api.modrinth.com/v2/user/"
 
 async function fetchNotifs(user, token) {
+    let h = new Headers({
+        "Authorization": token,
+        "User-Agent": `devBoi76/modrinthify/${chrome.runtime.getManifest().version}`
+    })
     let resp = await fetch(API_BASE+user+"/notifications", {
-        headers: {
-            Authorization: token 
-        }
+        headers: h
     })
 
     if (resp.status != 200) {
@@ -24,26 +28,26 @@ async function fetchNotifs(user, token) {
 async function browserAlarmListener(e) {
     if (e.name == "check-notifications") {
         let s = await chrome.storage.sync.get(["user", "token", "notif_enable"])
-        
+
         if (!s.notif_enable) {
-            chrome.action.setBadgeText({text: ""})
+            chrome.browserAction.setBadgeText({text: ""})
             return
         }
 
         let token = s.token
         let user = s.user
         let resp = await fetchNotifs(user, token)
-    
+
         if (resp.status == 401) {
             chrome.storage.sync.set({notif_enable: false, issue_connecting: 401})
-            chrome.action.setBadgeText({text: "ERR"});
+            chrome.browserAction.setBadgeText({text: "ERR"});
             return
         } else if (resp.status == 404) {
             chrome.storage.sync.set({notif_enable: false, issue_connecting: 404})
-            chrome.action.setBadgeText({text: "ERR"});
+            chrome.browserAction.setBadgeText({text: "ERR"});
             return
         }
-    
+
         let parsed = resp.notifications
         let updated = new Map();
         let old = new Map();
@@ -67,9 +71,9 @@ async function browserAlarmListener(e) {
         }
 
         if (n_updated > 0) {
-            chrome.action.setBadgeText({text: n_updated.toString()});
+            chrome.browserAction.setBadgeText({text: n_updated.toString()});
         } else {
-            chrome.action.setBadgeText({text: ""});
+            chrome.browserAction.setBadgeText({text: ""});
         }
         
     }
