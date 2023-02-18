@@ -149,6 +149,11 @@ function main() {
 			api_facets =`facets=[["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'"],["project_type:mod"]]`
 			break
 		//=Server=Plugins=====
+		case "mc-addons":
+			return
+		case "customization":
+			api_facets = `facets=[["project_type:shader"]]`
+			break
 		case "bukkit-plugins":
 			api_facets = `facets=[["categories:'bukkit'","categories:'spigot'","categories:'paper'","categories:'purpur'","categories:'sponge'","categories:'bungeecord'","categories:'waterfall'","categories:'velocity'"],["project_type:mod"]]`
 			break
@@ -195,16 +200,22 @@ function main() {
 		}
 		console.log("here2")
 		// Add the buttons
+		
+		let bd = document.querySelector("#modrinth-body")
+		if (bd) {bd.remove()}
+
 		if (is_search) {
 			if (is_new_design) {	
-				query = ".results-count"
+				// query = ".results-count"
+				query = ".search-tags"
 				let s = document.querySelector(query)
 				let buttonElement = htmlToElements(new_design_button
 				.replace("ICON_SOURCE", max_hit.icon_url)
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 				.replace("BUTTON_HTML", HTML))
-        s.appendChild(buttonElement)
+				buttonElement.childNodes[0].style.marginLeft = "auto"
+        		s.appendChild(buttonElement)
 			} else {
 				query = ".mt-6 > div:nth-child(3)"
 				let s = document.querySelector(query)
@@ -213,7 +224,7 @@ function main() {
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 				.replace("BUTTON_HTML", HTML))
-        s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			}
 			
 		} else {
@@ -226,7 +237,7 @@ function main() {
 				.replace("ICON_SOURCE", max_hit.icon_url)
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`))
-        s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			} else {
 
 				query =  "div.-mx-1:nth-child(1)"
@@ -236,20 +247,25 @@ function main() {
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 				.replace("BUTTON_HTML", HTML))
-        s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			}
 		}
 		// Add donation button if present
 		fetch(`https://api.modrinth.com/v2/project/${max_hit.slug}`, {method: "GET", mode: "cors"})
 		.then(response_p => response_p.json())
 		.then(resp_p => {
+			if (document.querySelector("#donate-button")) { return }
 			if (resp_p.donation_urls.length > 0) {
-
+				
 				let redir = document.getElementById("modrinth-body")
 
 				if (is_new_design) {
 					redir.innerHTML += new_design_donation.replace("REDIRECT", resp_p.donation_urls[0].url)
-					redir.style.marginRight = "-195.5px"
+					if (is_search) {
+						redir.style.marginRight = "-195.5px"
+					} else {
+						redir.style.marginRight = "-195.5px"
+					}
 				} else {
 
 					let donations = resp_p.donation_urls
@@ -270,3 +286,13 @@ function main() {
 }
 
 main()
+
+document.querySelector(".classes-list").childNodes.forEach( (el) => {
+	el.childNodes[0].addEventListener("click", main)
+})
+
+document.querySelector(".search-input-field").addEventListener("keydown", (event) => {
+	if (event.key == "Enter") {
+		main()
+	}
+})
