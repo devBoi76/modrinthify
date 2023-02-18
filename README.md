@@ -6,10 +6,8 @@ The extension will also show the creator's donation page whenever present
 
 The extension is available for [firefox](https://addons.mozilla.org/en-US/firefox/addon/modrinthify/), [chrome](https://chrome.google.com/webstore/detail/modrinthify/gjjlcbppchpjacimpkjhoancdbdmpcoc) and [as a userscript](https://greasyfork.org/en/scripts/445993-modrinthify), [spigot userscript](https://greasyfork.org/en/scripts/451067-modrinthify-spigot)
 
-![image](https://user-images.githubusercontent.com/77896685/173103271-b4d7d5a5-ce3e-4bd2-96e7-ec8e124a9f81.png)
-![image](https://user-images.githubusercontent.com/77896685/173103340-aefd345d-fdee-4fa3-9dfa-92f458a35a34.png)
-![image](https://user-images.githubusercontent.com/77896685/173103357-f2915565-a198-438e-8c68-582fe583f11a.png)
-![image](https://user-images.githubusercontent.com/77896685/188920913-2f04db54-2fcd-408a-803b-9ebc9cdeb033.png)
+![newcf_one_e_comp](https://user-images.githubusercontent.com/77896685/219877614-1e336385-f63d-4f54-a1ec-bd9b64b30c9f.png)
+![newcf_two_e_comp](https://user-images.githubusercontent.com/77896685/219877618-370e0ece-397c-4168-a154-6cc8b7fb10e7.png)
 
 Redirects on spigotmc.org:
 
