@@ -39,7 +39,7 @@ for (var i = 0; i <= s1.length; i++) {
 return costs[s2.length];
 }
 
-const new_design_button = '<a id="modrinth-body" href="REDIRECT" target="_blank" style="overflow: hidden; margin-top: -1px; display: flex" > <style>#modrinth-body{height: 36px; text-decoration: none; font-weight: 600; font-family: sans-serif; color: #e5e5e5; --mr-green: #30b27b;}#modrinth-body > div{display: flex; align-items: center;}#modrinthify-redirect{display: flex; height: 100%; align-items: center; background-color: var(--mr-green); font-weight: 600; padding-inline: 0.5rem;}#modrinthify-redirect > svg{height: 30px; margin-right: 0.5rem; fill: #e5e5e5;}</style> <div> <img style="display: inline-block; height: 36px; width: 36px" src="ICON_SOURCE"/> <div style="display: inline-block; margin-inline: 1rem; font-weight: 600" > MOD_NAME </div><div id="modrinthify-redirect" data-tooltip="Get on Modrinth" > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 141.73" aria-hidden="true" > <g> <path d="M159.07,89.29A70.94,70.94,0,1,0,20,63.52H32A58.78,58.78,0,0,1,145.23,49.93l-11.66,3.12a46.54,46.54,0,0,0-29-26.52l-2.15,12.13a34.31,34.31,0,0,1,2.77,63.26l3.19,11.9a46.52,46.52,0,0,0,28.33-49l11.62-3.1A57.94,57.94,0,0,1,147.27,85Z" transform="translate(-19.79)" fill-rule="evenodd" ></path> <path transform="translate(-19.79)" d="M108.92,139.3A70.93,70.93,0,0,1,19.79,76h12a59.48,59.48,0,0,0,1.78,9.91,58.73,58.73,0,0,0,3.63,9.91l10.68-6.41a46.58,46.58,0,0,1,44.72-65L90.43,36.54A34.38,34.38,0,0,0,57.36,79.75C57.67,80.88,58,82,58.43,83l13.66-8.19L68,63.93l12.9-13.25,16.31-3.51L101.9,53l-7.52,7.61-6.55,2.06-4.69,4.82,2.3,6.38s4.64,4.94,4.65,4.94l6.57-1.74,4.67-5.13,10.2-3.24,3,6.84L104.05,88.43,86.41,94l-7.92-8.81L64.7,93.48a34.44,34.44,0,0,0,28.72,11.59L96.61,117A46.6,46.6,0,0,1,54.13,99.83l-10.64,6.38a58.81,58.81,0,0,0,99.6-9.77l11.8,4.29A70.77,70.77,0,0,1,108.92,139.3Z" ></path> </g> </svg> Get on Modrinth </div></div></a>'
+const new_design_button = '<a id="modrinth-body" href="REDIRECT" target="_blank" style="overflow: hidden; margin-top: -1px; display: flex" > <style>#modrinth-body{height: 36px; text-decoration: none; font-weight: 600; font-family: sans-serif; color: #e5e5e5; --mr-green: #30b27b; transition: none;}#modrinth-body > div{display: flex; align-items: center;}#modrinthify-redirect{display: flex; height: 100%; align-items: center; background-color: var(--mr-green); font-weight: 600; padding-inline: 0.5rem;}#modrinthify-redirect > svg{height: 30px; margin-right: 0.5rem; fill: #e5e5e5;}</style> <div> <img style="display: inline-block; height: 36px; width: 36px" src="ICON_SOURCE"/> <div style="display: inline-block; margin-inline: 1rem; font-weight: 600" > MOD_NAME </div><div id="modrinthify-redirect" data-tooltip="Get on Modrinth" > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 141.73" aria-hidden="true" > <g> <path d="M159.07,89.29A70.94,70.94,0,1,0,20,63.52H32A58.78,58.78,0,0,1,145.23,49.93l-11.66,3.12a46.54,46.54,0,0,0-29-26.52l-2.15,12.13a34.31,34.31,0,0,1,2.77,63.26l3.19,11.9a46.52,46.52,0,0,0,28.33-49l11.62-3.1A57.94,57.94,0,0,1,147.27,85Z" transform="translate(-19.79)" fill-rule="evenodd" ></path> <path transform="translate(-19.79)" d="M108.92,139.3A70.93,70.93,0,0,1,19.79,76h12a59.48,59.48,0,0,0,1.78,9.91,58.73,58.73,0,0,0,3.63,9.91l10.68-6.41a46.58,46.58,0,0,1,44.72-65L90.43,36.54A34.38,34.38,0,0,0,57.36,79.75C57.67,80.88,58,82,58.43,83l13.66-8.19L68,63.93l12.9-13.25,16.31-3.51L101.9,53l-7.52,7.61-6.55,2.06-4.69,4.82,2.3,6.38s4.64,4.94,4.65,4.94l6.57-1.74,4.67-5.13,10.2-3.24,3,6.84L104.05,88.43,86.41,94l-7.92-8.81L64.7,93.48a34.44,34.44,0,0,0,28.72,11.59L96.61,117A46.6,46.6,0,0,1,54.13,99.83l-10.64,6.38a58.81,58.81,0,0,0,99.6-9.77l11.8,4.29A70.77,70.77,0,0,1,108.92,139.3Z" ></path> </g> </svg> Get on Modrinth </div></div></a>'
 
 const new_design_donation = `<a id="donate-button" target="_blank" href="REDIRECT" data-tooltip="Support the Author" > <style>#donate-button{background-color: #ff5e5b; font-weight: 600; text-decoration: none; display: flex; align-items: center; padding-right: 0.5rem;}#donate-button img{height: 100%; width: 36px;}</style> <img src=${browser.runtime.getURL("icons/kofilogo.png")}> Support the Author </a>`;
 
@@ -90,14 +90,14 @@ let mod_name_noloader = undefined
 let page = undefined
 
 function main() {
-
+	console.log("A")
 	const url = document.URL.split("/")
 	console.log(url)
 	page = url[4]
 	
 	const is_new_design = document.querySelector("#__next") != null
 	
-	const is_search = is_new_design ? (url[4].split("?")[0] == "search") : (url[5].split("?")[0] == "search" && url[5].split("?").length >= 2)
+	const is_search = is_new_design ? (url[4].split("?")[0] == "search") : (url[5].startsWith("search") && url[5].split("?").length >= 2)
 
 	
 
@@ -105,6 +105,7 @@ function main() {
 
 	if (is_search) {
 		if (is_new_design) {
+			search_query = document.querySelector(".search-input-field").value 
 			console.log("a")
 		}
 		else {
@@ -122,9 +123,18 @@ function main() {
 	}
 
 	console.log("here1", page)
-		mod_name = search_query
-		mod_name_noloader = mod_name.replace(REGEX, "")
-		console.log(mod_name, mod_name_noloader)
+	
+	mod_name = search_query
+	mod_name_noloader = mod_name.replace(REGEX, "")
+	console.log(mod_name, mod_name_noloader)
+
+	if (is_search && is_new_design) {
+		page_re = /.*&class=(.*?)&.*/
+		page = (page.match(page_re) || ["", "all"])[1]
+	}
+
+	console.log("here1.5", page)
+
 
 	api_facets = ""
 	switch (page) {
@@ -143,6 +153,9 @@ function main() {
 		//=Modpacks===========
 		case "modpacks":
 			api_facets = `facets=[["project_type:modpack"]]`
+			break
+		case "all":
+			api_facets = ``
 			break
 	}
 	console.log("fetch")
@@ -177,13 +190,24 @@ function main() {
 		console.log("here2")
 		// Add the buttons
 		if (is_search) {
-			query = ".mt-6 > div:nth-child(3)"
-			let s = document.querySelector(query)
-			s.innerHTML += SEARCH_PAGE_HTML
-			.replace("ICON_SOURCE", max_hit.icon_url)
-			.replace("MOD_NAME", max_hit.title.trim())
-			.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
-			.replace("BUTTON_HTML", HTML)
+
+			if (is_new_design) {	
+				query = ".results-count"
+				let s = document.querySelector(query)
+				s.innerHTML += new_design_button
+				.replace("ICON_SOURCE", max_hit.icon_url)
+				.replace("MOD_NAME", max_hit.title.trim())
+				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
+				.replace("BUTTON_HTML", HTML)
+			} else {
+				query = ".mt-6 > div:nth-child(3)"
+				let s = document.querySelector(query)
+				s.innerHTML += SEARCH_PAGE_HTML
+				.replace("ICON_SOURCE", max_hit.icon_url)
+				.replace("MOD_NAME", max_hit.title.trim())
+				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
+				.replace("BUTTON_HTML", HTML)
+			}
 			
 		} else {
 
