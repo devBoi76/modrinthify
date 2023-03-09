@@ -96,7 +96,6 @@ let mod_name_noloader = undefined
 let page = undefined
 
 function main() {
-	console.log("main()")
 	const url = document.URL.split("/")
 	page = url[4]
 	
@@ -114,7 +113,7 @@ function main() {
 	} else {
 		if (is_new_design) {
 			// search_query = document.querySelector(".project-header > h1:nth-child(2)").innerText
-			search_query = document.querySelector("head > title:nth-child(2)").innerText.split(" - ")[0]
+			search_query = document.querySelector("head > title:nth-child(2)").innerText.split(" Minecraft Mods")[0]
 		} else {
 			search_query = document.querySelector("head meta[property='og:title']").getAttribute("content")
 		}
@@ -128,7 +127,6 @@ function main() {
 		page = (page.match(page_re) || ["", "all"])[1]
 	}
 
-	console.log(page)
 	api_facets = ""
 	switch (page) {
 		//=Mods===============
@@ -156,6 +154,7 @@ function main() {
 			api_facets = ``
 			break
 	}
+	
 	fetch(`https://api.modrinth.com/v2/search?limit=3&query=${mod_name_noloader}&${api_facets}`, {method: "GET", mode: "cors"})
 	.then(response => response.json())
 	.then(resp => {
@@ -166,7 +165,7 @@ function main() {
 		if (page == undefined) {
 			return
 		}
-		
+
 		if (resp.hits.length == 0) {
 			return
 		}
@@ -184,6 +183,7 @@ function main() {
 				max_hit = hit
 			}
 		}
+
 		if (max_sim <= 0.7) {
 			return
 		}
@@ -211,9 +211,7 @@ function main() {
 				.replace("BUTTON_HTML", HTML))
         		s.appendChild(buttonElement)
 			}
-			
 		} else {
-
 			if (is_new_design) {
 				query = ".actions"
 				let s = document.querySelector(query)

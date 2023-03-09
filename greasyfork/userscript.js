@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.curseforge.com/minecraft/*
 // @grant       none
-// @version     1.6.0
+// @version     1.6.1
 // @author      devBoi76
 // @license     MIT
 // @description Redirect curseforge.com mod pages to modrinth.com when possible
@@ -109,14 +109,13 @@ let mod_name_noloader = undefined
 let page = undefined
 
 function main() {
-	console.log("main()")
 	const url = document.URL.split("/")
 	page = url[4]
 	
 	const is_new_design = document.querySelector("#__next") != null
 	
 	const is_search = is_new_design ? (url[4].split("?")[0] == "search") : (url[5].startsWith("search") && url[5].split("?").length >= 2)
-	
+
 	if (is_search) {
 		if (is_new_design) {
 			search_query = document.querySelector(".search-input-field").value
@@ -127,7 +126,7 @@ function main() {
 	} else {
 		if (is_new_design) {
 			// search_query = document.querySelector(".project-header > h1:nth-child(2)").innerText
-			search_query = document.querySelector("head > title:nth-child(2)").innerText.split(" - ")[0]
+			search_query = document.querySelector("head > title:nth-child(2)").innerText.split(" Minecraft Mods")[0]
 		} else {
 			search_query = document.querySelector("head meta[property='og:title']").getAttribute("content")
 		}
@@ -135,20 +134,19 @@ function main() {
 	
 	mod_name = search_query
 	mod_name_noloader = mod_name.replace(REGEX, "")
-	
+
 	if (is_search && is_new_design) {
 		page_re = /.*&class=(.*?)&.*/
-page = (page.match(page_re) || ["", "all"])[1]
+		page = (page.match(page_re) || ["", "all"])[1]
 	}
-	
-	console.log(page)
+
 	api_facets = ""
 	switch (page) {
 		//=Mods===============
 		case "mc-mods":
 			api_facets =`facets=[["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'"],["project_type:mod"]]`
 			break
-			//=Server=Plugins=====
+		//=Server=Plugins=====
 		case "mc-addons":
 			return
 		case "customization":
@@ -157,11 +155,11 @@ page = (page.match(page_re) || ["", "all"])[1]
 		case "bukkit-plugins":
 			api_facets = `facets=[["categories:'bukkit'","categories:'spigot'","categories:'paper'","categories:'purpur'","categories:'sponge'","categories:'bungeecord'","categories:'waterfall'","categories:'velocity'"],["project_type:mod"]]`
 			break
-			//=Resource=Packs=====
+		//=Resource=Packs=====
 		case "texture-packs":
 			api_facets = `facets=[["project_type:resourcepack"]]`
 			break
-			//=Modpacks===========
+		//=Modpacks===========
 		case "modpacks":
 			api_facets = `facets=[["project_type:modpack"]]`
 			break
@@ -169,24 +167,25 @@ page = (page.match(page_re) || ["", "all"])[1]
 			api_facets = ``
 			break
 	}
+	
 	fetch(`https://api.modrinth.com/v2/search?limit=3&query=${mod_name_noloader}&${api_facets}`, {method: "GET", mode: "cors"})
 	.then(response => response.json())
 	.then(resp => {
-		
+
 		let bd = document.querySelector("#modrinth-body")
 		if (bd) {bd.remove()}
-		
+
 		if (page == undefined) {
 			return
 		}
-		
+
 		if (resp.hits.length == 0) {
 			return
 		}
 		
 		let max_sim = 0
 		let max_hit = undefined
-		
+
 		for (const hit of resp.hits) {
 			if (similarity(hit.title.trim(), mod_name) > max_sim) {
 				max_sim = similarity(hit.title.trim(), mod_name.trim())
@@ -197,11 +196,12 @@ page = (page.match(page_re) || ["", "all"])[1]
 				max_hit = hit
 			}
 		}
+
 		if (max_sim <= 0.7) {
 			return
 		}
 		// Add the buttons
-		
+
 		if (is_search) {
 			if (is_new_design) {	
 				// query = ".results-count"
@@ -213,7 +213,7 @@ page = (page.match(page_re) || ["", "all"])[1]
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 				.replace("BUTTON_HTML", HTML))
 				buttonElement.childNodes[0].style.marginLeft = "auto"
-				s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			} else {
 				query = ".mt-6 > div:nth-child(3)"
 				let s = document.querySelector(query)
@@ -222,11 +222,9 @@ page = (page.match(page_re) || ["", "all"])[1]
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 				.replace("BUTTON_HTML", HTML))
-				s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			}
-			
 		} else {
-			
 			if (is_new_design) {
 				query = ".actions"
 				let s = document.querySelector(query)
@@ -234,9 +232,9 @@ page = (page.match(page_re) || ["", "all"])[1]
 				.replace("ICON_SOURCE", max_hit.icon_url)
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`))
-				s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			} else {
-				
+
 				query =  "div.-mx-1:nth-child(1)"
 				let s = document.querySelector(query)
 				let buttonElement = htmlToElements(MOD_PAGE_HTML
@@ -244,7 +242,7 @@ page = (page.match(page_re) || ["", "all"])[1]
 				.replace("MOD_NAME", max_hit.title.trim())
 				.replace("REDIRECT", `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`)
 				.replace("BUTTON_HTML", HTML))
-				s.appendChild(buttonElement)
+        		s.appendChild(buttonElement)
 			}
 		}
 		// Add donation button if present
@@ -255,7 +253,7 @@ page = (page.match(page_re) || ["", "all"])[1]
 			if (resp_p.donation_urls.length > 0) {
 				
 				let redir = document.getElementById("modrinth-body")
-				
+
 				if (is_new_design) {
 					redir.innerHTML += new_design_donation.replace("REDIRECT", resp_p.donation_urls[0].url)
 					if (is_search) {
@@ -264,7 +262,7 @@ page = (page.match(page_re) || ["", "all"])[1]
 						redir.style.marginRight = "-195.5px"
 					}
 				} else {
-					
+
 					let donations = resp_p.donation_urls
 					let dbutton = document.createElement("div")
 					dbutton.innerHTML = DONATE_HTML.replace("REDIRECT", donations[0].url)
@@ -274,7 +272,7 @@ page = (page.match(page_re) || ["", "all"])[1]
 					if (!is_search) {
 						redir.parentNode.parentNode.parentNode.style.marginRight = "-150px"
 					}
-					
+
 				}
 			}
 		})
@@ -295,9 +293,3 @@ new MutationObserver( () => {
 		main()
 	}
 }).observe(document, {subtree: true, childList: true})
-
-// document.querySelector(".search-input-field").addEventListener("keydown", (event) => {
-// 	if (event.key == "Enter") {
-// 		main()
-// 	}
-// })
