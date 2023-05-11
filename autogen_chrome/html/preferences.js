@@ -30,7 +30,7 @@ async function saveOptions(e) {
     const check_delay = data.get("notif-check-delay");
     
     const token = data.get("token").trim();
-    console.log(token)
+    // console.log(token)
 
     if (notif_enable == true && (token == "" || token == undefined)) {
         document.querySelector(".error").innerText = "Please fill out these fields to enable notifications"
@@ -55,7 +55,7 @@ async function saveOptions(e) {
     }
 
     let old_token = await chrome.storage.sync.get("token")
-    console.log(old_token, '"', token)
+    // console.log(old_token, '"', token)
 
     if (old_token.token != token && notif_enable == true) {
 
