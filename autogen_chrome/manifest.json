@@ -2,7 +2,7 @@
 
   "manifest_version": 3,
   "name": "Modrinthify",
-  "version": "1.6.1",
+  "version": "1.6.2",
 
   "description": "Redirect Curseforge mod pages to Modrinth and show Modrinth notifications",
 
@@ -39,6 +39,9 @@
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "html/preferences.html"
   }
 
 }
