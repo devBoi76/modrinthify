@@ -40,7 +40,6 @@ async function fetchNotifs(user, token) {
         }
     }
     let json = await resp.json()
-    console.log(json)
     return {
         status: 200,
         notifications: json,
@@ -91,7 +90,7 @@ function build_notification(project_info, versions_info) {
     notification.className = "notification"
     
     let s = ""
-    if (versions_info.length > 1) {s = "s"}
+    if (versions_info && versions_info.length > 1) {s = "s"}
 
     notification.innerHTML = `<div class="header"><h4>${project_info.title}</h4><p>${versions_info.length} new version${s}:</p></div>`
     
@@ -231,19 +230,23 @@ async function updateNotifs(ignore_last_checked) {
 
     let result = await Promise.all([pro_json, ver_json])
     let projects = result[0]
+    projects.sort( (a, b) => {
+        unixA = Date.parse(a.updated)
+        unixB = Date.parse(b.updated)
+        if (unixA > unixB) {return -1}
+        else {return 1}
+
+    })
     let versions = result[1]
-    
-    console.log(projects)
-    console.log(versions)
+
 
     // Map project_id => [version_info]
     let project_id_to_version_info = new Map()
     for (let i = 0; i < versions.length; i++) {
         let v = versions[i]
-        if (!project_id_to_version_info.has(v.project_id)) {
-            project_id_to_version_info[v.project_id] = [];
-        }
-        project_id_to_version_info[v.project_id].push(v);
+        let a = project_id_to_version_info.get(v.project_id) || []
+        a.push(v)
+        project_id_to_version_info.set(v.project_id, a);
     }
     // Map project_id => project_info
     let project_id_to_project_info = new Map()
@@ -299,10 +302,9 @@ async function updateNotifs(ignore_last_checked) {
         }
     })
 
-    for (const id of project_ids) {
-
-        build_notification(project_id_to_project_info[id],
-                           project_id_to_version_info[id])
+    for (project_info of projects) {
+        build_notification(project_info,
+                           project_id_to_version_info.get(project_info.id))
     }
 
     updated.forEach( (new_vers, title) => {
@@ -416,7 +418,6 @@ async function saveOptions(e) {
     const check_delay = data.get("notif-check-delay");
     
     const token = data.get("token").trim();
-    // console.log(token)
 
     if (notif_enable == true && (token == "" || token == undefined)) {
         document.querySelector(".error").innerText = "Please fill out these fields to enable notifications"
@@ -441,7 +442,6 @@ async function saveOptions(e) {
     }
 
     let old_token = await browser.storage.sync.get("token")
-    // console.log(old_token, '"', token)
 
     if (old_token.token != token && notif_enable == true) {
 
