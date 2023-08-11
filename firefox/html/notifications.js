@@ -32,6 +32,7 @@ async function fetchNotifs(user, token) {
         headers: h
     })
 
+
     if (resp.status != 200) {
         return {
             status: resp.status,
@@ -39,6 +40,7 @@ async function fetchNotifs(user, token) {
         }
     }
     let json = await resp.json()
+    console.log(json)
     return {
         status: 200,
         notifications: json,
@@ -81,6 +83,50 @@ function toggleExpandNotif() {
         }
         this.innerText = `+${hideable.length} More`
     }
+}
+
+function build_notification(project_info, versions_info) {
+
+    let notification = document.createElement("div")
+    notification.className = "notification"
+    
+    let s = ""
+    if (versions_info.length > 1) {s = "s"}
+
+    notification.innerHTML = `<div class="header"><h4>${project_info.title}</h4><p>${versions_info.length} new version${s}:</p></div>`
+    
+    document.querySelector("#notifications").appendChild(notification);
+    let i = 0
+    for (const v of versions_info) {
+        i++
+        let version = document.createElement("a")
+        version.className = "version"
+        if (i > N_VERSIONS) {
+            version.classList = "version hideable"
+        }
+
+        const link = `/mod/${v.project_id}/version/${v.id}`
+        version.href = LINK_BASE + link
+        version.target = "_blank"
+
+        let time_passed = Date.now() - Date.parse(v.date_published)
+        
+        let time_string = timeStringForUnix(time_passed)
+        
+        version.setAttribute("after_text", time_string)
+        
+        version.innerText = v.version_number
+        notification.appendChild(version);
+    }
+    if (i > N_VERSIONS) {
+        let more = document.createElement("p")
+        more.classList = "more"
+        more.setAttribute("is_expanded", false)
+        more.addEventListener("click", toggleExpandNotif)
+        more.innerText = `+${i - N_VERSIONS} More`
+        notification.appendChild(more)
+    }
+
 }
 
 async function updateNotifs(ignore_last_checked) {
@@ -146,26 +192,86 @@ async function updateNotifs(ignore_last_checked) {
     let parsed = resp.notifications
 
 
-    let updated = new Map();
-    let old = new Map();
+    let updated = new Map()
+    let old = new Map()
     let n_old = 0
     let n_updated = 0
 
+    // To mass fetch version strings
+    let version_ids = new Array()
+    let project_ids = new Set()
+    
+    let notif_ids = new Array()
+
+    for (let i = 0; i < parsed.length; i++) {
+        notif = parsed[i];
+        if (notif.body) {
+            if (notif.body.type != "project_update") {
+                continue
+            }
+
+            version_ids.push(notif.body.version_id)
+            project_ids.add(notif.body.project_id)
+            notif_ids.push(notif.id)
+        }
+    }
+
+    // fetch titles and add notifications
+    
+    // NOTE: Project and version result has the same order as the query parameters
+
+    let pids_query = '["' + Array.from(project_ids).join('","') + '"]';
+    let verids_query = '["' + version_ids.join('","') + '"]';
+    pro_json = fetch(API_BASE + "/projects?ids=" + pids_query).then((response) => {
+        return response.json()
+    })
+    ver_json = fetch(API_BASE + "/versions?ids=" + verids_query).then((response) => {
+        return response.json()
+    })
+
+    let result = await Promise.all([pro_json, ver_json])
+    let projects = result[0]
+    let versions = result[1]
+    
+    console.log(projects)
+    console.log(versions)
+
+    // Map project_id => [version_info]
+    let project_id_to_version_info = new Map()
+    for (let i = 0; i < versions.length; i++) {
+        let v = versions[i]
+        if (!project_id_to_version_info.has(v.project_id)) {
+            project_id_to_version_info[v.project_id] = [];
+        }
+        project_id_to_version_info[v.project_id].push(v);
+    }
+    // Map project_id => project_info
+    let project_id_to_project_info = new Map()
+    for (let i = 0; i < projects.length; i++) {
+        project_id_to_project_info[projects[i].id] = projects[i];
+    }
+
+    // Old notification type logic
     for (let i = 0; i < parsed.length; i++) {
         let el = parsed[i]
         let last_checked = (await browser.storage.sync.get(["last_checked"])).last_checked
         if ((last_checked > Date.parse(el.created))) {
-            let a = old.get(el.title) || []
-            a.push(el)
-            old.set(el.title, a)
+            if (el.body.type == "legacy_markdown") {
+                let a = old.get(el.title) || []
+                a.push(el)
+                old.set(el.title, a)
+            }
             n_old += 1
         } else {
-            let a = updated.get(el.title) || []
-            a.push(el)
-            updated.set(el.title, a)
+            if (el.body.type == "legacy_markdown") {
+                let a = updated.get(el.title) || []
+                a.push(el)
+                updated.set(el.title, a)
+            }
             n_updated += 1
         }
     }
+    // end
     
     if (document.querySelector("#no-notifs")) {
         document.querySelector("#no-notifs").remove()
@@ -193,18 +299,24 @@ async function updateNotifs(ignore_last_checked) {
         }
     })
 
-    updated.forEach( (val, key) => {
+    for (const id of project_ids) {
+
+        build_notification(project_id_to_project_info[id],
+                           project_id_to_version_info[id])
+    }
+
+    updated.forEach( (new_vers, title) => {
         let notification = document.createElement("div")
         notification.className = "notification"
         
         let s = ""
-        if (val.length > 1) {s = "s"}
+        if (new_vers.length > 1) {s = "s"}
 
-        notification.innerHTML = `<div class="header"><h4>${key.replaceAll("**", "")}</h4><p>${val.length} new version${s}:</p></div>`
+        notification.innerHTML = `<div class="header"><h4>${title.replaceAll("**", "")}</h4><p>${new_vers.length} new version${s}:</p></div>`
         
         document.querySelector("#notifications").appendChild(notification);
         let i = 0
-        for (const notif of val) {
+        for (const notif of new_vers) {
             i++
             let version = document.createElement("a")
             version.className = "version"
@@ -416,6 +528,7 @@ async function closeSettings() {
 }
 
 async function updateLastChecked() {
+    // Remove notifications
     unix = Date.now();
     browser.storage.sync.set({
         last_checked: unix
