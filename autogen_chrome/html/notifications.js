@@ -376,6 +376,7 @@ async function updateNotifs(ignore_last_checked) {
             })
             document.querySelectorAll(".notification").forEach( (el) => el.classList.add("being-cleared"))
             if (resp.status == 204) {
+                document.querySelectorAll(".notification").forEach(el => el.remove())
                 updateNotifs(false)
             } else {
                 document.querySelectorAll(".notification").forEach( (el) => el.classList.remove("being-cleared"))
