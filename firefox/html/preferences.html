@@ -2,7 +2,6 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <!-- <link rel="stylesheet" href="choose_beast.css" /> -->
   </head>
   <style>
     :root {
@@ -239,6 +238,16 @@
         opacity: 1;
     }
 
+    .inline-link {
+        color: var(--accent) !important;
+        display: inline !important;
+        text-decoration: underline 2px !important;
+    }
+    
+    ul {
+        margin-block: 0.2rem;
+    }
+
   </style>
   <style>
     #settings {
@@ -347,10 +356,15 @@
         <label for="notif-check-delay">Check every:<input type="number" name="notif-check-delay" id="notif-check-delay" placeholder=5>minutes</label>
         <hr>
         <p>
-            Copy these from your security and general settings on Modrinth:
+            Create a token from <a class="inline-link" href="https://modrinth.com/settings/pats" target="_blank">your settings</a>. Make sure to allow:
+            <ul>
+                <li>Read user data</li>
+                <li>Read/Write notifications</li>
+                <li>Read projects</li>
+                <li>Read versions</li>
+            </ul>
         </p>
-        <br>
-        <label for="token">Authorization token:</h4>
+        <label for="token"><h4 style="display: inline-block">API access token:</h4>
             <input name="token" id="token" type="password">
         </label>
     </form>
