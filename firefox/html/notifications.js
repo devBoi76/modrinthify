@@ -73,7 +73,7 @@ function toggleExpandNotif() {
 
     if (this.getAttribute("is_expanded") == "true") {
         for (const el of hideable) {
-            el.style.display = "block"
+            el.style.display = "flex"
         }
         this.innerText = "- Less"
     } else {
@@ -84,7 +84,7 @@ function toggleExpandNotif() {
     }
 }
 
-function build_notification(project_info, versions_info) {
+function build_notification(auth_token, project_info, versions_info, isOldType, startHidden = false) {
 
     let notification = document.createElement("div")
     notification.className = "notification"
@@ -92,29 +92,88 @@ function build_notification(project_info, versions_info) {
     let s = ""
     if (versions_info && versions_info.length > 1) {s = "s"}
 
-    notification.innerHTML = `<div class="header"><h4>${project_info.title}</h4><p>${versions_info.length} new version${s}:</p></div>`
+    const title = isOldType ? project_info.replaceAll("**", "") : project_info.title + " has been updated!"
+
+    notification.innerHTML = `<div class="header"><h4>${title}</h4><p>${versions_info.length} new version${s}:</p></div>`
+    notification.setAttribute("data-notification-count", versions_info.length)
     
     document.querySelector("#notifications").appendChild(notification);
     let i = 0
     for (const v of versions_info) {
         i++
-        let version = document.createElement("a")
+        let version = document.createElement("div")
         version.className = "version"
         if (i > N_VERSIONS) {
             version.classList = "version hideable"
         }
+        let version_link = document.createElement("a")
+        version_link.className = "version-link"
 
-        const link = `/mod/${v.project_id}/version/${v.id}`
-        version.href = LINK_BASE + link
-        version.target = "_blank"
+        const link = isOldType ? v.link : `/mod/${v.project_id}/version/${v.id}`
+        version_link.href = LINK_BASE + link
+        version_link.target = "_blank"
 
-        let time_passed = Date.now() - Date.parse(v.date_published)
+        const version_number = isOldType ? v.text.match(version_regex)[1] : v.version_number
+        version_link.innerText = version_number
+        version.appendChild(version_link)
+        version.setAttribute("data-notification-id", v.id)
+        
+        let clear_hitbox = document.createElement("div")
+        clear_hitbox.className = "clear-hitbox"
+        clear_hitbox.innerText = "Clear"
+        
+        version.appendChild(clear_hitbox)
+        clear_hitbox.addEventListener("click", async (ev) => {
+            let el = ev.currentTarget
+            el.parentElement.classList.add("being-cleared")
+            console.log("Foo")
+            let h = new Headers({
+                "Authorization": auth_token,
+                "User-Agent": `devBoi76/modrinthify/${browser.runtime.getManifest().version}`,
+            })
+            let resp = await fetch(API_BASE + `/notification/${el.parentElement.getAttribute("data-notification-id")}`, {
+                headers: h,
+                method: "DELETE"
+            })
+            if (resp.status == 204) {
+                console.log(el)
+                let notification_el = el.parentElement.parentElement
+                let n_left = parseInt(notification_el.getAttribute("data-notification-count"))
+                if (n_left - 1 > N_VERSIONS) {
+                    
+                    let to_display = notification_el.querySelector(".hideable")
+                    to_display.classList.remove("hideable")
+                    
+                    let more_button = notification_el.querySelector(".more")
+                    let mb_is_closed = (more_button.getAttribute("is_expanded") == "false")
+                    
+                    // Update "more" text
+                    if (mb_is_closed) {
+                        more_button.innerText = `+${n_left - N_VERSIONS - 1} More`
+                    }
+                    
+                    notification_el.setAttribute("data-notification-count", n_left - 1)
+                    el.parentElement.remove()
+                } else if (n_left - 1 == 0) {
+                    notification_el.remove()
+                } else {
+                    el.parentElement.remove()
+                }
+
+            } else {
+                el.parentElement.classList.remove("being-cleared")
+            }
+        })
+        
+        const date_published = isOldType ? v.created : v.date_published
+        let time_passed = Date.now() - Date.parse(date_published)
         
         let time_string = timeStringForUnix(time_passed)
         
         version.setAttribute("after_text", time_string)
-        
-        version.innerText = v.version_number
+        if (startHidden) {
+            notification.classList.add("hideable")
+        }
         notification.appendChild(version);
     }
     if (i > N_VERSIONS) {
@@ -190,11 +249,7 @@ async function updateNotifs(ignore_last_checked) {
 
     let parsed = resp.notifications
 
-
-    let updated = new Map()
-    let old = new Map()
-    let n_old = 0
-    let n_updated = 0
+    // New notification type logic
 
     // To mass fetch version strings
     let version_ids = new Array()
@@ -255,10 +310,17 @@ async function updateNotifs(ignore_last_checked) {
     }
 
     // Old notification type logic
+
+    let updated = new Map()
+    let old = new Map()
+    let n_old = 0
+    let n_updated = 0
+
     for (let i = 0; i < parsed.length; i++) {
         let el = parsed[i]
         let last_checked = (await browser.storage.sync.get(["last_checked"])).last_checked
-        if ((last_checked > Date.parse(el.created))) {
+        let created_date = (el.body.type == "legacy_markdown") ? el.created : el.date_published
+        if ((last_checked > Date.parse(created_date))) {
             if (el.body.type == "legacy_markdown") {
                 let a = old.get(el.title) || []
                 a.push(el)
@@ -303,48 +365,49 @@ async function updateNotifs(ignore_last_checked) {
     })
 
     for (project_info of projects) {
-        build_notification(project_info,
-                           project_id_to_version_info.get(project_info.id))
+        build_notification(global_auth_token, project_info,
+                           project_id_to_version_info.get(project_info.id), false, false)
     }
 
     updated.forEach( (new_vers, title) => {
-        let notification = document.createElement("div")
-        notification.className = "notification"
+        build_notification(global_auth_token, title, new_vers, true, false)
+        // let notification = document.createElement("div")
+        // notification.className = "notification"
         
-        let s = ""
-        if (new_vers.length > 1) {s = "s"}
+        // let s = ""
+        // if (new_vers.length > 1) {s = "s"}
 
-        notification.innerHTML = `<div class="header"><h4>${title.replaceAll("**", "")}</h4><p>${new_vers.length} new version${s}:</p></div>`
+        // notification.innerHTML = `<div class="header"><h4>${title.replaceAll("**", "")}</h4><p>${new_vers.length} new version${s}:</p></div>`
         
-        document.querySelector("#notifications").appendChild(notification);
-        let i = 0
-        for (const notif of new_vers) {
-            i++
-            let version = document.createElement("a")
-            version.className = "version"
-            if (i > N_VERSIONS) {
-                version.classList = "version hideable"
-            }
-            version.href = LINK_BASE + notif.link
-            version.target = "_blank"
+        // document.querySelector("#notifications").appendChild(notification);
+        // let i = 0
+        // for (const notif of new_vers) {
+        //     i++
+        //     let version = document.createElement("a")
+        //     version.className = "version"
+        //     if (i > N_VERSIONS) {
+        //         version.classList = "version hideable"
+        //     }
+        //     version.href = LINK_BASE + notif.link
+        //     version.target = "_blank"
 
-            let time_passed = Date.now() - Date.parse(notif.created)
+        //     let time_passed = Date.now() - Date.parse(notif.created)
             
-            let time_string = timeStringForUnix(time_passed)
+        //     let time_string = timeStringForUnix(time_passed)
             
-            version.setAttribute("after_text", time_string)
+        //     version.setAttribute("after_text", time_string)
 
-            version.innerText = notif.text.match(version_regex)[1]
-            notification.appendChild(version);
-        }
-        if (i > N_VERSIONS) {
-            let more = document.createElement("p")
-            more.classList = "more"
-            more.setAttribute("is_expanded", false)
-            more.addEventListener("click", toggleExpandNotif)
-            more.innerText = `+${i - N_VERSIONS} More`
-            notification.appendChild(more)
-        }
+        //     version.innerText = notif.text.match(version_regex)[1]
+        //     notification.appendChild(version);
+        // }
+        // if (i > N_VERSIONS) {
+        //     let more = document.createElement("p")
+        //     more.classList = "more"
+        //     more.setAttribute("is_expanded", false)
+        //     more.addEventListener("click", toggleExpandNotif)
+        //     more.innerText = `+${i - N_VERSIONS} More`
+        //     notification.appendChild(more)
+        // }
     })
 
     if (n_old > 0) {
@@ -361,47 +424,53 @@ async function updateNotifs(ignore_last_checked) {
         document.querySelector("#more-old").addEventListener("click", toggleSeeOld)
 
         // Place hidden old notifs
-        old.forEach( (val, key) => {
-            let notification = document.createElement("div")
-            notification.classList = "notification hideable"
+        old.forEach( (new_vers, title) => {
+            build_notification(global_auth_token, title, new_vers, true, true)
+            // let notification = document.createElement("div")
+            // notification.classList = "notification hideable"
             
-            let s = ""
-            if (val.length > 1) {s = "s"}
+            // let s = ""
+            // if (val.length > 1) {s = "s"}
 
-            notification.innerHTML = `<div class="header"><h4>${key.replaceAll("**", "")}</h4><p>${val.length} new version${s}:</p></div>`
+            // notification.innerHTML = `<div class="header"><h4>${key.replaceAll("**", "")}</h4><p>${val.length} new version${s}:</p></div>`
             
-            document.querySelector("#notifications").appendChild(notification);
-            let i = 0
-            for (const notif of val) {
-                i++
-                let version = document.createElement("a")
-                version.className = "version"
-                if (i > N_VERSIONS) {
-                    version.classList = "version hideable"
-                }
-                version.href = LINK_BASE + notif.link
-                version.target = "_blank"
+            // document.querySelector("#notifications").appendChild(notification);
+            // let i = 0
+            // for (const notif of val) {
+            //     i++
+            //     let version = document.createElement("a")
+            //     version.className = "version"
+            //     if (i > N_VERSIONS) {
+            //         version.classList = "version hideable"
+            //     }
+            //     version.href = LINK_BASE + notif.link
+            //     version.target = "_blank"
 
-                let time_passed = Date.now() - Date.parse(notif.created)
+            //     let time_passed = Date.now() - Date.parse(notif.created)
                 
-                let time_string = timeStringForUnix(time_passed)
+            //     let time_string = timeStringForUnix(time_passed)
                 
-                version.setAttribute("after_text", time_string)
+            //     version.setAttribute("after_text", time_string)
 
-                version.innerText = notif.text.match(version_regex)[1]
-                notification.appendChild(version);
-            }
-            if (i > N_VERSIONS) {
-                let more = document.createElement("p")
-                more.classList = "more"
-                more.setAttribute("is_expanded", false)
-                more.addEventListener("click", toggleExpandNotif)
-                more.innerText = `+${i - N_VERSIONS} More`
-                notification.appendChild(more)
-            }
+            //     version.innerText = notif.text.match(version_regex)[1]
+            //     notification.appendChild(version);
+            // }
+            // if (i > N_VERSIONS) {
+            //     let more = document.createElement("p")
+            //     more.classList = "more"
+            //     more.setAttribute("is_expanded", false)
+            //     more.addEventListener("click", toggleExpandNotif)
+            //     more.innerText = `+${i - N_VERSIONS} More`
+            //     notification.appendChild(more)
+            // }
         })
     }
     document.querySelector("#refresh-icon-a").classList = ""
+    // document.querySelectorAll(".clear-hitbox").forEach( (el) => {
+    //     el.addEventListener("click", (ev) => {
+    //         console.log(el.parentElement.getAttribute("data-notification-id"))
+    //     })
+    // })
 }
 
 async function saveOptions(e) {
@@ -509,7 +578,6 @@ async function restoreSettings() {
         else if (a.issue_connecting == 404) {
             document.querySelector(".error").innerText = "There has been an issue connecting to Modrinth:\nError 404 User not found\n(Invalid token)"
             document.querySelector(".error").style.display = "block"
-    
         }
     }
     
