@@ -534,7 +534,7 @@ async function restoreSettings() {
 
     a.theme = a.theme || "auto"
     document.querySelector(`#${a.theme}-theme`).checked = "on"
-    document.querySelector("#notif-check-delay").value = a.check_delay || 5
+    document.querySelector("#notif-check-delay").value = a.check_delay || 10
 
     if (a.issue_connecting != 0) {
         if (a.issue_connecting == 401) {
