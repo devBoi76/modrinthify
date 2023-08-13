@@ -45,6 +45,7 @@ for f in copy_files:
     autogen_cr_filename = f.replace("firefox", OUT_FOLDER)
     cr_filename = f.replace("firefox", "chrome")
     os.makedirs(os.path.dirname(autogen_cr_filename), exist_ok=True)
+    print(f"cp {cr_filename} {autogen_cr_filename}")
     os.system(f"cp {cr_filename} {autogen_cr_filename}")
 
 print("\nZIP EXTENSIONS\n")
