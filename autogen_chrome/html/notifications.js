@@ -96,10 +96,14 @@ function build_notification(auth_token, project_info, versions_info, isOldType, 
 
     const title = isOldType ? project_info.replaceAll("**", "") : project_info.title + " has been updated!"
 
-    notification.innerHTML = `<div class="header"><h4>${title}</h4><p>${versions_info.length} new version${s}:</p></div>`
+    notification.innerHTML = `<div class="header"><h4>${title}</h4> \
+    <p>${versions_info.length} new version${s}:</p><div class="clear-all-button">Clear</div></div>`
     notification.setAttribute("data-notification-count", versions_info.length)
     
     document.querySelector("#notifications").appendChild(notification);
+
+    let version_ids = []
+
     let i = 0
     for (const v of versions_info) {
         i++
@@ -119,6 +123,7 @@ function build_notification(auth_token, project_info, versions_info, isOldType, 
         version_link.innerText = version_number
         version.appendChild(version_link)
         version.setAttribute("data-notification-id", v.id)
+        version_ids.push(v.id)
         
         let clear_hitbox = document.createElement("div")
         clear_hitbox.className = "clear-hitbox"
@@ -128,7 +133,6 @@ function build_notification(auth_token, project_info, versions_info, isOldType, 
         clear_hitbox.addEventListener("click", async (ev) => {
             let el = ev.currentTarget
             el.parentElement.classList.add("being-cleared")
-            console.log("Foo")
             let h = new Headers({
                 "Authorization": auth_token,
                 "User-Agent": `devBoi76/modrinthify/${chrome.runtime.getManifest().version}`,
@@ -138,19 +142,21 @@ function build_notification(auth_token, project_info, versions_info, isOldType, 
                 method: "DELETE"
             })
             if (resp.status == 204) {
-                console.log(el)
                 let notification_el = el.parentElement.parentElement
                 let n_left = parseInt(notification_el.getAttribute("data-notification-count"))
                 if (n_left - 1 > N_VERSIONS) {
+                    
                     let to_display = notification_el.querySelector(".hideable")
                     to_display.classList.remove("hideable")
+                    
                     let more_button = notification_el.querySelector(".more")
-                    console.log(more_button, more_button.getAttribute("is_expanded"))
                     let mb_is_closed = (more_button.getAttribute("is_expanded") == "false")
-                    console.log(mb_is_closed)
+                    
+                    // Update "more" text
                     if (mb_is_closed) {
                         more_button.innerText = `+${n_left - N_VERSIONS - 1} More`
                     }
+                    
                     notification_el.setAttribute("data-notification-count", n_left - 1)
                     el.parentElement.remove()
                 } else if (n_left - 1 == 0) {
@@ -163,10 +169,6 @@ function build_notification(auth_token, project_info, versions_info, isOldType, 
                 el.parentElement.classList.remove("being-cleared")
             }
         })
-
-        // clear_hitbox.addEventListener("mouseleave", (ev) => {
-            
-        // })
         
         const date_published = isOldType ? v.created : v.date_published
         let time_passed = Date.now() - Date.parse(date_published)
@@ -178,6 +180,24 @@ function build_notification(auth_token, project_info, versions_info, isOldType, 
             notification.classList.add("hideable")
         }
         notification.appendChild(version);
+        notification.querySelector(".clear-all-button").addEventListener("click", async (ev) => {
+            
+            let query_string = '["' + version_ids.join('","') + '"]'
+            let h = new Headers({
+                "Authorization": auth_token,
+                "User-Agent": `devBoi76/modrinthify/${chrome.runtime.getManifest().version}`,
+            })
+            let notif = ev.currentTarget.parentElement.parentElement
+            notif.classList.add("being-cleared")
+            
+            let resp = await fetch(API_BASE + `/notifications?ids=` + query_string, {
+                headers: h,
+                method: "DELETE"
+            })
+            if (resp.status == 204) {
+                notif.remove()
+            }
+        })
     }
     if (i > N_VERSIONS) {
         let more = document.createElement("p")
@@ -273,6 +293,7 @@ async function updateNotifs(ignore_last_checked) {
         }
     }
 
+
     // fetch titles and add notifications
     
     // NOTE: Project and version result has the same order as the query parameters
@@ -323,6 +344,7 @@ async function updateNotifs(ignore_last_checked) {
         let el = parsed[i]
         let last_checked = (await chrome.storage.sync.get(["last_checked"])).last_checked
         let created_date = (el.body.type == "legacy_markdown") ? el.created : el.date_published
+        notif_ids.push(el.id)
         if ((last_checked > Date.parse(created_date))) {
             if (el.body.type == "legacy_markdown") {
                 let a = old.get(el.title) || []
@@ -340,6 +362,28 @@ async function updateNotifs(ignore_last_checked) {
         }
     }
     // end
+
+        // Update "Clear all" button with new IDs
+        let cback = async (ev) => {
+            let query_string = '["' + notif_ids.join('","') + '"]'
+            let h = new Headers({
+                "Authorization": global_auth_token,
+                "User-Agent": `devBoi76/modrinthify/${chrome.runtime.getManifest().version}`,
+            })
+            let resp = await fetch(API_BASE + `/notifications?ids=` + query_string, {
+                headers: h,
+                method: "DELETE"
+            })
+            document.querySelectorAll(".notification").forEach( (el) => el.classList.add("being-cleared"))
+            if (resp.status == 204) {
+                updateNotifs(false)
+            } else {
+                document.querySelectorAll(".notification").forEach( (el) => el.classList.remove("being-cleared"))
+            }
+        }
+        document.querySelector("#icon-clear-a").removeEventListener("click", cback)
+        document.querySelector("#icon-clear-a").addEventListener("click", cback)
+    
     
     if (document.querySelector("#no-notifs")) {
         document.querySelector("#no-notifs").remove()
@@ -374,43 +418,6 @@ async function updateNotifs(ignore_last_checked) {
 
     updated.forEach( (new_vers, title) => {
         build_notification(global_auth_token, title, new_vers, true, false)
-        // let notification = document.createElement("div")
-        // notification.className = "notification"
-        
-        // let s = ""
-        // if (new_vers.length > 1) {s = "s"}
-
-        // notification.innerHTML = `<div class="header"><h4>${title.replaceAll("**", "")}</h4><p>${new_vers.length} new version${s}:</p></div>`
-        
-        // document.querySelector("#notifications").appendChild(notification);
-        // let i = 0
-        // for (const notif of new_vers) {
-        //     i++
-        //     let version = document.createElement("a")
-        //     version.className = "version"
-        //     if (i > N_VERSIONS) {
-        //         version.classList = "version hideable"
-        //     }
-        //     version.href = LINK_BASE + notif.link
-        //     version.target = "_blank"
-
-        //     let time_passed = Date.now() - Date.parse(notif.created)
-            
-        //     let time_string = timeStringForUnix(time_passed)
-            
-        //     version.setAttribute("after_text", time_string)
-
-        //     version.innerText = notif.text.match(version_regex)[1]
-        //     notification.appendChild(version);
-        // }
-        // if (i > N_VERSIONS) {
-        //     let more = document.createElement("p")
-        //     more.classList = "more"
-        //     more.setAttribute("is_expanded", false)
-        //     more.addEventListener("click", toggleExpandNotif)
-        //     more.innerText = `+${i - N_VERSIONS} More`
-        //     notification.appendChild(more)
-        // }
     })
 
     if (n_old > 0) {
@@ -429,51 +436,9 @@ async function updateNotifs(ignore_last_checked) {
         // Place hidden old notifs
         old.forEach( (new_vers, title) => {
             build_notification(global_auth_token, title, new_vers, true, true)
-            // let notification = document.createElement("div")
-            // notification.classList = "notification hideable"
-            
-            // let s = ""
-            // if (val.length > 1) {s = "s"}
-
-            // notification.innerHTML = `<div class="header"><h4>${key.replaceAll("**", "")}</h4><p>${val.length} new version${s}:</p></div>`
-            
-            // document.querySelector("#notifications").appendChild(notification);
-            // let i = 0
-            // for (const notif of val) {
-            //     i++
-            //     let version = document.createElement("a")
-            //     version.className = "version"
-            //     if (i > N_VERSIONS) {
-            //         version.classList = "version hideable"
-            //     }
-            //     version.href = LINK_BASE + notif.link
-            //     version.target = "_blank"
-
-            //     let time_passed = Date.now() - Date.parse(notif.created)
-                
-            //     let time_string = timeStringForUnix(time_passed)
-                
-            //     version.setAttribute("after_text", time_string)
-
-            //     version.innerText = notif.text.match(version_regex)[1]
-            //     notification.appendChild(version);
-            // }
-            // if (i > N_VERSIONS) {
-            //     let more = document.createElement("p")
-            //     more.classList = "more"
-            //     more.setAttribute("is_expanded", false)
-            //     more.addEventListener("click", toggleExpandNotif)
-            //     more.innerText = `+${i - N_VERSIONS} More`
-            //     notification.appendChild(more)
-            // }
         })
     }
     document.querySelector("#refresh-icon-a").classList = ""
-    // document.querySelectorAll(".clear-hitbox").forEach( (el) => {
-    //     el.addEventListener("click", (ev) => {
-    //         console.log(el.parentElement.getAttribute("data-notification-id"))
-    //     })
-    // })
 }
 
 async function saveOptions(e) {
@@ -529,7 +494,7 @@ async function saveOptions(e) {
         })
         close_icon.classList = ""
         if (resp.status == 401) {
-            document.querySelector(".error").innerText = "Invalid authorization token"
+            document.querySelector(".error").innerText = "Invalid API authorization token"
             document.querySelector(".error").style.display = "block"
             document.querySelector("#token").style.outline = "4px solid #db316255"
 
@@ -619,8 +584,7 @@ document.querySelector("#settings-icon").addEventListener("click", restoreSettin
 document.querySelector("#close-icon").addEventListener("click", closeSettings);
 document.querySelector("form").addEventListener("submit", saveOptions);
 document.querySelector("#refresh-icon-a").addEventListener("click", updateNotifsNoVar)
-document.querySelector("#icon-clear-a").addEventListener("click",     updateLastChecked
-)
+// document.querySelector("#icon-clear-a").addEventListener("click",     updateLastChecked)
 document.addEventListener("DOMContentLoaded", updateNotifsNoVar)
 
 function changeTheme() {
