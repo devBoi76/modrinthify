@@ -47,23 +47,15 @@ async function browserAlarmListener(e) {
         }
 
         let parsed = resp.notifications
-        let updated = new Map();
-        let old = new Map();
         let n_old = 0
         let n_updated = 0
         last_checked = (await browser.storage.sync.get(["last_checked"])).last_checked        
         for (let i = 0; i < parsed.length; i++) {
             let el = parsed[i]
-            
-            if (last_checked > Date.parse(el.created)) {
-                let a = old.get(el.title) || []
-                a.push(el)
-                old.set(el.title, a)
+            let date_created = (el.body.type == "legacy_markdown") ? el.created : el.date_published
+            if (last_checked > Date.parse(date_created)) {
                 n_old += 1
             } else {
-                let a = updated.get(el.title) || []
-                a.push(el)
-                updated.set(el.title, a)
                 n_updated += 1
             }
         }
@@ -79,9 +71,9 @@ async function browserAlarmListener(e) {
 
 async function setAlarm() {
     
-    let check_delay = (await browser.storage.sync.get(["check_delay"])).check_delay
+    let check_delay = parseFloat((await browser.storage.sync.get(["check_delay"])).check_delay)
     
-    if (check_delay == "0") {
+    if (check_delay == 0) {
         return
     }
 
