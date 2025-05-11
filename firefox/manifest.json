@@ -1,51 +1,42 @@
 {
+    "manifest_version": 2,
+    "name": "Modrinthify",
+    "version": "1.7.2",
 
-  "manifest_version": 2,
-  "name": "Modrinthify",
-  "version": "1.7.1",
+    "description": "When looking at Minecraft mods on CurseForge this extension automatically searches Modrinth for the mod and shows you a redirect button if it finds it",
 
-  "description": "When looking at Minecraft mods on CurseForge this extension automatically searches Modrinth for the mod and shows you a redirect button if it finds it",
-
-  "icons": {
-    "48": "icons/favicon.png" 
-  },
-  "permissions": [
-    "https://api.modrinth.com/v2/*",
-    "storage",
-    "alarms"
-  ],
-  
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{5183707f-8a46-4092-8c1f-e4515bcebbad}",
-      "strict_min_version": "57.0"
-    }
-  },
-  
-  
-  "content_scripts": [
-    {
-      "matches": ["*://*.curseforge.com/minecraft/*"],
-      "js": ["main.js"]
+    "icons": {
+        "48": "icons/favicon.png"
     },
-    {
-      "matches": ["*://*.spigotmc.org/*"],
-      "js": ["spigot.js"]
-    }
-  ],
-  "web_accessible_resources": [
-    "icons/kofilogo.png"
-  ],
-  "browser_action": {
-    "default_icon": "icons/favicon.png",
-    "default_title": "Modrinthify",
-    "default_popup": "html/main.html"
-  },
-  "background": {
-    "scripts": ["background.js"]
-  },
-  "options_ui": {
-    "page": "html/preferences.html"
-  }
-}
+    "permissions": ["https://api.modrinth.com/v2/*", "storage", "alarms"],
 
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{5183707f-8a46-4092-8c1f-e4515bcebbad}",
+            "strict_min_version": "57.0"
+        }
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["*://*.curseforge.com/minecraft/*"],
+            "js": ["main.js"]
+        },
+        {
+            "matches": ["*://*.spigotmc.org/*"],
+            "js": ["spigot.js"]
+        }
+    ],
+    "web_accessible_resources": ["icons/kofilogo.png"],
+    "browser_action": {
+        "default_icon": "icons/favicon.png",
+        "default_title": "Modrinthify",
+        "default_popup": "html/main.html"
+    },
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "options_ui": {
+        "page": "html/preferences.html"
+    }
+}
