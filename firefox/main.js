@@ -104,7 +104,7 @@ function main() {
     const url = document.URL.split("/");
     page = url[4];
 
-    const is_new_design = !document.domain.startsWith("old.curseforge.com");
+    const is_new_design = !document.hostname.startsWith("old.curseforge.com");
 
     const is_search = is_new_design
         ? url[4].split("?")[0] == "search"
@@ -164,19 +164,18 @@ function main() {
             api_facets = ``;
             break;
     }
-    console.log("mod name", mod_name_noloader);
+
     fetch(
         `https://api.modrinth.com/v2/search?limit=3&query=${mod_name_noloader}&${api_facets}`,
         { method: "GET", mode: "cors" },
     )
         .then((response) => response.json())
         .then((resp) => {
-            console.log(resp);
             let bd = document.querySelector("#modrinth-body");
             if (bd) {
                 bd.remove();
             }
-            console.log("page", page);
+
             if (page == undefined) {
                 return;
             }
@@ -201,12 +200,11 @@ function main() {
                     max_hit = hit;
                 }
             }
-            console.log("max_sim", max_sim);
+
             if (max_sim <= 0.7) {
                 return;
             }
             // Add the buttons
-            console.log("HERE1");
 
             if (is_search) {
                 if (is_new_design) {
@@ -243,9 +241,7 @@ function main() {
                     s.appendChild(buttonElement);
                 }
             } else {
-                console.log("HERE2");
                 if (is_new_design) {
-                    console.log("HERE3");
                     query = ".actions";
                     let s = document.querySelector(query);
                     let buttonElement = htmlToElements(
@@ -258,7 +254,6 @@ function main() {
                             ),
                     );
                     s.appendChild(buttonElement);
-                    console.log("HERE4");
                 } else {
                     query = "div.-mx-1:nth-child(1)";
                     let s = document.querySelector(query);
