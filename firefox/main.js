@@ -104,7 +104,7 @@ function main() {
     const url = document.URL.split("/");
     page = url[4];
 
-    const is_new_design = !document.hostname.startsWith("old.curseforge.com");
+    const is_new_design = !location.hostname.startsWith("old.curseforge.com");
 
     const is_search = is_new_design
         ? url[4].split("?")[0] == "search"
