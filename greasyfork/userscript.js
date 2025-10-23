@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.curseforge.com/minecraft/*
 // @grant       none
-// @version     1.6.2
+// @version     1.6.3
 // @author      devBoi76
 // @license     MIT
 // @description Redirect curseforge.com mod pages to modrinth.com when possible
@@ -61,9 +61,9 @@ function editDistance(s1, s2) {
 }
 
 const new_design_button =
-    '<a id="modrinth-body" href="REDIRECT" target="_blank" style="overflow: hidden; margin-top: -1px; display: flex" > <style>#modrinth-body:hover {background-color: #4d4d4d;}#modrinth-body{background-color: #333; height: 36px; text-decoration: none; font-weight: 600; font-family: sans-serif; color: #e5e5e5; --mr-green: #30b27b; transition: background-color 0.15s ease;}#modrinth-body > div{display: flex; align-items: center;}#modrinthify-redirect{display: flex; height: 100%; align-items: center; background-color: var(--mr-green); font-weight: 600; padding-inline: 0.5rem;}#modrinthify-redirect > svg{height: 30px; margin-right: 0.5rem; fill: #e5e5e5;}</style> <div> <img style="display: inline-block; height: 36px; width: 36px" src="ICON_SOURCE"/> <div style="display: inline-block; margin-inline: 1rem; font-weight: 600" > MOD_NAME </div><div id="modrinthify-redirect" data-tooltip="Get on Modrinth" > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 141.73" aria-hidden="true" > <g> <path d="M159.07,89.29A70.94,70.94,0,1,0,20,63.52H32A58.78,58.78,0,0,1,145.23,49.93l-11.66,3.12a46.54,46.54,0,0,0-29-26.52l-2.15,12.13a34.31,34.31,0,0,1,2.77,63.26l3.19,11.9a46.52,46.52,0,0,0,28.33-49l11.62-3.1A57.94,57.94,0,0,1,147.27,85Z" transform="translate(-19.79)" fill-rule="evenodd" ></path> <path transform="translate(-19.79)" d="M108.92,139.3A70.93,70.93,0,0,1,19.79,76h12a59.48,59.48,0,0,0,1.78,9.91,58.73,58.73,0,0,0,3.63,9.91l10.68-6.41a46.58,46.58,0,0,1,44.72-65L90.43,36.54A34.38,34.38,0,0,0,57.36,79.75C57.67,80.88,58,82,58.43,83l13.66-8.19L68,63.93l12.9-13.25,16.31-3.51L101.9,53l-7.52,7.61-6.55,2.06-4.69,4.82,2.3,6.38s4.64,4.94,4.65,4.94l6.57-1.74,4.67-5.13,10.2-3.24,3,6.84L104.05,88.43,86.41,94l-7.92-8.81L64.7,93.48a34.44,34.44,0,0,0,28.72,11.59L96.61,117A46.6,46.6,0,0,1,54.13,99.83l-10.64,6.38a58.81,58.81,0,0,0,99.6-9.77l11.8,4.29A70.77,70.77,0,0,1,108.92,139.3Z" ></path> </g> </svg> Get on Modrinth </div></div></a>';
+    '<a id="modrinth-body" href="REDIRECT" target="_blank" style="width: fit-content; overflow: hidden; margin-top: 1rem; display: flex" > <style>#modrinth-body:hover {background-color: #4d4d4d;}#modrinth-body{background-color: #333; height: 36px; text-decoration: none; font-weight: 600; font-family: sans-serif; color: #e5e5e5; --mr-green: #30b27b; transition: background-color 0.15s ease;}#modrinth-body > div{display: flex; align-items: center;}#modrinthify-redirect{display: flex; height: 100%; align-items: center; background-color: var(--mr-green); font-weight: 600; padding-inline: 0.5rem;}#modrinthify-redirect > svg{height: 30px; margin-right: 0.5rem; fill: #e5e5e5;}</style> <div> <img style="display: inline-block; height: 36px; width: 36px" src="ICON_SOURCE"/> <div style="display: inline-block; margin-inline: 1rem; font-weight: 600" > MOD_NAME </div><div id="modrinthify-redirect" data-tooltip="Get on Modrinth" > <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 141.73" aria-hidden="true" > <g> <path d="M159.07,89.29A70.94,70.94,0,1,0,20,63.52H32A58.78,58.78,0,0,1,145.23,49.93l-11.66,3.12a46.54,46.54,0,0,0-29-26.52l-2.15,12.13a34.31,34.31,0,0,1,2.77,63.26l3.19,11.9a46.52,46.52,0,0,0,28.33-49l11.62-3.1A57.94,57.94,0,0,1,147.27,85Z" transform="translate(-19.79)" fill-rule="evenodd" ></path> <path transform="translate(-19.79)" d="M108.92,139.3A70.93,70.93,0,0,1,19.79,76h12a59.48,59.48,0,0,0,1.78,9.91,58.73,58.73,0,0,0,3.63,9.91l10.68-6.41a46.58,46.58,0,0,1,44.72-65L90.43,36.54A34.38,34.38,0,0,0,57.36,79.75C57.67,80.88,58,82,58.43,83l13.66-8.19L68,63.93l12.9-13.25,16.31-3.51L101.9,53l-7.52,7.61-6.55,2.06-4.69,4.82,2.3,6.38s4.64,4.94,4.65,4.94l6.57-1.74,4.67-5.13,10.2-3.24,3,6.84L104.05,88.43,86.41,94l-7.92-8.81L64.7,93.48a34.44,34.44,0,0,0,28.72,11.59L96.61,117A46.6,46.6,0,0,1,54.13,99.83l-10.64,6.38a58.81,58.81,0,0,0,99.6-9.77l11.8,4.29A70.77,70.77,0,0,1,108.92,139.3Z" ></path> </g> </svg> Get on Modrinth </div></div></a>';
 
-const new_design_donation = `<a id="donate-button" target="_blank" href="REDIRECT" data-tooltip="Support the Author" > <style>#donate-button{background-color: #ff5e5b; font-weight: 600; text-decoration: none; display: flex; align-items: center; padding-right: 0.5rem;}#donate-button img{height: 100%; width: 36px;}</style> <img src="https://i.ibb.co/Y2Xgd4Q/kofilogo.png"> Support the Author </a>`;
+const new_design_donation = `<a id="donate-button" target="_blank" href="REDIRECT" data-tooltip="Support the Author" > <style>#donate-button{color: color: #e5e5e5; background-color: #ff5e5b; font-weight: 600; text-decoration: none; display: flex; align-items: center; padding-right: 0.5rem;}#donate-button img{height: 100%; width: 36px;}</style> <img src="https://i.ibb.co/Y2Xgd4Q/kofilogo.png"> Support the Author </a>`;
 
 const svg =
     '<svg class="h-full absolute" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 777 141.73" aria-hidden="true" class="text-logo"><g><path d="M159.07,89.29A70.94,70.94,0,1,0,20,63.52H32A58.78,58.78,0,0,1,145.23,49.93l-11.66,3.12a46.54,46.54,0,0,0-29-26.52l-2.15,12.13a34.31,34.31,0,0,1,2.77,63.26l3.19,11.9a46.52,46.52,0,0,0,28.33-49l11.62-3.1A57.94,57.94,0,0,1,147.27,85Z" transform="translate(-19.79)" fill="var(--color-brand)" fill-rule="evenodd"></path><path transform="translate(-19.79)" fill="var(--color-brand)" d="M108.92,139.3A70.93,70.93,0,0,1,19.79,76h12a59.48,59.48,0,0,0,1.78,9.91,58.73,58.73,0,0,0,3.63,9.91l10.68-6.41a46.58,46.58,0,0,1,44.72-65L90.43,36.54A34.38,34.38,0,0,0,57.36,79.75C57.67,80.88,58,82,58.43,83l13.66-8.19L68,63.93l12.9-13.25,16.31-3.51L101.9,53l-7.52,7.61-6.55,2.06-4.69,4.82,2.3,6.38s4.64,4.94,4.65,4.94l6.57-1.74,4.67-5.13,10.2-3.24,3,6.84L104.05,88.43,86.41,94l-7.92-8.81L64.7,93.48a34.44,34.44,0,0,0,28.72,11.59L96.61,117A46.6,46.6,0,0,1,54.13,99.83l-10.64,6.38a58.81,58.81,0,0,0,99.6-9.77l11.8,4.29A70.77,70.77,0,0,1,108.92,139.3Z"></path></g></svg>';
@@ -255,8 +255,6 @@ function main() {
                 }
             } else {
                 if (is_new_design) {
-                    query = ".actions";
-                    let s = document.querySelector(query);
                     let buttonElement = htmlToElements(
                         new_design_button
                             .replace("ICON_SOURCE", max_hit.icon_url)
@@ -266,7 +264,22 @@ function main() {
                                 `https://modrinth.com/${max_hit.project_type}/${max_hit.slug}`,
                             ),
                     );
-                    s.appendChild(buttonElement);
+
+                    const injectButton = () => {
+                        query = ".breadcrumbs";
+                        if (document.querySelector("#modrinth-body")) return;
+
+                        let s = document.querySelector(query);
+                        if (!s) return;
+                        console.log("Inject", s);
+                        s.appendChild(buttonElement);
+                    };
+                    injectButton();
+                    const observer = new MutationObserver(() => injectButton());
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true,
+                    });
                 } else {
                     query = "div.-mx-1:nth-child(1)";
                     let s = document.querySelector(query);
