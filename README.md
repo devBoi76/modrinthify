@@ -1,5 +1,8 @@
 # modrinthify
 
+> [!NOTE]
+> This project is in maintenance mode. I do not plan to add any new features. You should only expect fixes as long as someone reports an issue.
+
 When looking at Minecraft mods, modpacks, plugins and resource packs on curseforge.com, Modrinthify automatically searches modrinth.com for the mod and shows you a redirect button if it finds it. If you click on that button you will be taken to the project's Modrinth project page
 
 The extension will also show the creator's donation page whenever present
